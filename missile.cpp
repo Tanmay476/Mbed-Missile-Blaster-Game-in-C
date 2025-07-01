@@ -11,6 +11,7 @@
 
 #include "missile_private.h"
 #include "doubly_linked_list.h"
+#include "missile_public.h"
 
 int missile_tick=0;
 
@@ -55,17 +56,20 @@ void missile_create(void){
     MISSILE* newMissile = (MISSILE *)malloc(sizeof(MISSILE));
 
     // 2. The missile starts at the top of the screen
-    newMissile-> = 
+    newMissile->y = 0;
+    
     // 3. Randomly set a missile source_x and target_x
+    newMissile->source_x = rand() % SIZE_X; 
+    newMissile->x = newMissile->source_x;
     //  HINT: Keep in mind the width of the screen SIZE_X, and 
     //      set the x-coord of the missle
     
     // 4. Set the active status of the missile and 
-
+    newMissile->status = MISSILE_ACTIVE;
     // 5. each missile has its own tick
-    
+    newMissile->tick = 0;
     // 6. Insert missile into the appropriate container object.
-
+    insertHead(missileDLL, newMissile);
 }
 
 /**
@@ -79,7 +83,7 @@ void missile_update_position(void){
 
     // 1. Init a missile and define how fast the missile will move. 
     //  You might also want to define dx, dy for the missile
-    
+    MISSILE* newMissile = (MISSILE *)malloc(sizeof(MISSILE)); 
     // 2. Loop through all the missiles
     //      2a. If the missile's status is MISSILE_EXPLODED
     //          2a1. Erase missile by drawing a blank missile on current 
@@ -88,6 +92,13 @@ void missile_update_position(void){
     //          2b1. Erase missile by drawing a blank missile on current position
     //          2b2. Update missile position and draw at new position
     //          2b3. Update missile's internal tick
+
+    LLNode *currNode = missileDLL->head;
+    int index = 0;
+    while (index < missileDLL->size) {
+        MISSILE* currentMissile = (MISSILE*)(currNode->data);
+                                                                                                                                                                                                                                                                                                                                    
+    }
 
 }
 
