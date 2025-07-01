@@ -217,7 +217,7 @@ int get_action(GameInputs in) {
 
   // 2. Check your navigation switch and return the corresponding direction value
   //return new changes
-
+  
   // 3. If no button is pressed, just return no action value
   return NO_ACTION;
 }
