@@ -90,12 +90,12 @@ void player_fire() {
 #endif
 
   // 1. Initialize a missile from the player's current position
-/*    MISSILE* tempMissile = (MISSILE *)malloc(sizeof(MISSILE));
+   MISSILE* tempMissile = (MISSILE *)malloc(sizeof(MISSILE));
     tempMissile->source_x = player.x;
   // 2. Set the status of the missile from player
     tempMissile->status = MISSILE_ACTIVE;
   // 3. Add new missile to appropriate DLL object
-  insertHead(player.playerMissiles, tempMissile);*/
+  insertHead(player.playerMissiles, tempMissile);
 }
 
 /**
@@ -108,7 +108,7 @@ void player_missile_draw(void) {
 #endif
 
   // 1. Initialize the missile
-  //  MISSILE* tempMissile = (MISSILE *)malloc(sizeof(MISSILE));
+    MISSILE* tempMissile = (MISSILE *)malloc(sizeof(MISSILE));
     
   // 2. Looping through all player missiles
   //      2a. If missile status is MISSLE_EXPLODED
@@ -120,15 +120,30 @@ void player_missile_draw(void) {
   //  NOTE: You don't have to necessarily show the trace of the missile.
   //        To draw the missile, you can use the uLCD.line(). A similar library
   //              is used in missile.cpp
-   /* LLNode *currNode = player.playerMissiles->head;
+    LLNode *currNode = player.playerMissiles->head;
     int index = 0;
     while (index < player.playerMissiles->size) {
-        if (((MISSILE*)(currNode->data))->status == MISSILE_EXPLODED) {
-                deleteNode(player.playerMissiles, currNode);
+        MISSILE* currentMissile = (MISSILE*)(currNode->data)
+        if (currentMissile->status == MISSILE_EXPLODED) {
+                missile_draw(currentMissile, BLACK);
+                LLNode *nodeToDelete = currNode; 
+                currNode = currNode->next;
+                deleteNode(player.playerMissiles, nodeToDelete);
         } else {
-            ((MISSILE*)(currNode->data))->
+            missile_draw(currentMissile, BLACK);
+            currentMissile->y += MISSILE_PLAYER_SPEED; 
+            if(currentMissile-y < 0 || currentMissile->y > SIZE_Y) {
+                LLNode *nodeToDelete = currNode;
+                currNode = currNode->next;
+                deleteNode(player.playerMissiles, nodeToDelete);
+            } else {
+                missile_draw(currentMissile, BLUE);
+                currNode = currNode->next;
+                index++;
+            }
+            
         }
-    }*/
+    }
   
 }
 //new comments
