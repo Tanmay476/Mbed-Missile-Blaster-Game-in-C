@@ -122,17 +122,17 @@ void player_missile_draw(void) {
   //              is used in missile.cpp
     LLNode *currNode = player.playerMissiles->head;
     while (currNode != NULL) {
-        MISSILE* currentMissile = (MISSILE*)(currNode->data)
+        MISSILE* currentMissile = (MISSILE*)(currNode->data);
         if (currentMissile->status == MISSILE_EXPLODED) {
                 missile_draw(currentMissile, BLACK);
-                free(currentMissile); 
-                deleteNode(player.playerMissiles, nodeToDelete);
+                free(currNode); 
+                deleteNode(player.playerMissiles, currNode);
         } else {
             missile_draw(currentMissile, BLACK);
-            currentMissile->y += MISSILE_PLAYER_SPEED; 
-            if(currentMissile-y < 0 || currentMissile->y > SIZE_Y) {
-                free(currentMissile); 
-                deleteNode(player.playerMissiles, nodeToDelete);
+            currentMissile->y += MISSILE_SPEED; 
+            if(currentMissile->y < 0 || currentMissile->y > 128) {
+                free(currNode); 
+                deleteNode(player.playerMissiles, currNode);
             } else {
                 missile_draw(currentMissile, BLUE);
             }

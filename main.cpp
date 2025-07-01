@@ -213,7 +213,10 @@ int get_action(GameInputs in) {
       return GO_RIGHT;
   } else if (in.b1 || in.ns_left) {
       return GO_LEFT;
-  } 
+  }
+  if (in.b3) {
+      return BUTTON_X;
+  }
 
   // 2. Check your navigation switch and return the corresponding direction value
   //return new changes
@@ -262,6 +265,7 @@ int perform_action(int action) {
             /**
              * TODO: Performs a fire action. You might find it helpful to find player_fire().
              */
+             player_fire();
             return ACTED;
 
     }
@@ -291,12 +295,14 @@ int update_game(PLAYER player) {
             player_moveRight();
         
     }
+    
     // 1. Generate and draw the enemy missiles.
+    missile_generator();
     //  HINT: Look at the Missile class
-
+    
     // 2. Draw the playyer's missile, as needed.
     //  HINT: Look at the Player class
-
+    player_missile_draw();
     // 3. Update the city landscape. If an enemy missile hits a the city,
     //      you want to update the count and other related things.
     //      HINT: It would be useful to implement update_city_landscape()

@@ -100,7 +100,7 @@ void missile_update_position(void){
         MISSILE* currentMissile = (MISSILE*)(currNode->data);
         if (currentMissile->status == MISSILE_EXPLODED) {
             missile_draw(currentMissile, BLACK);
-            free(currentMissile);
+            free(currNode);
             deleteNode(missileDLL, currNode);
         } else {
              missile_draw(currentMissile, BLACK);
@@ -108,7 +108,7 @@ void missile_update_position(void){
              currentMissile->x = currentMissile->source_x +
                                 (currentMissile->y * (float)(currentMissile->target_x - currentMissile->source_x) / SIZE_Y);
             if (currentMissile->y >= SIZE_Y) {
-                free(currentMissile); 
+                free(currNode); 
                 deleteNode(missileDLL, currNode);
             } else {
                 missile_draw(currentMissile, MISSILE_COLOR);
