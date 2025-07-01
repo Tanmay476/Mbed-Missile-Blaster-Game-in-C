@@ -91,9 +91,14 @@ void player_fire() {
 
   // 1. Initialize a missile from the player's current position
    MISSILE* tempMissile = (MISSILE *)malloc(sizeof(MISSILE));
-    tempMissile->source_x = player.x;
+    tempMissile->source_x = player.x + player.width/2;
+    
+    tempMissile->x = tempMissile->source_x;
+    tempMissile->y = player.y;
+    tempMissile->target_x = tempMissile->source_x;
   // 2. Set the status of the missile from player
     tempMissile->status = MISSILE_ACTIVE;
+    tempMissile->tick = 0;
   // 3. Add new missile to appropriate DLL object
   insertHead(player.playerMissiles, tempMissile);
 }
@@ -124,18 +129,19 @@ void player_missile_draw(void) {
     while (currNode != NULL) {
         MISSILE* currentMissile = (MISSILE*)(currNode->data);
         nextNode = currNode->next;
+        uLCD.line(currentMissile->x, currentMissile->y,
+                          currentMissile->x, currentMissile->y + PLAYER_MISSILE_LENGTH, BLACK);
         if (currentMissile->status == MISSILE_EXPLODED) {
-                missile_draw(currentMissile, BLACK);
                 free(currentMissile); 
                 deleteNode(player.playerMissiles, currNode);
         } else {
-            missile_draw(currentMissile, BLACK);
-            currentMissile->y += MISSILE_SPEED; 
-            if(currentMissile->y < 0) {
+            currentMissile->y -= MISSILE_SPEED; 
+            if(currentMissile->y + PLAYER_MISSILE_LENGTH < 0) {
                 free(currentMissile); 
                 deleteNode(player.playerMissiles, currNode);
             } else {
-                missile_draw(currentMissile, BLUE);
+                uLCD.line(currentMissile->x, currentMissile->y,
+                          currentMissile->x, currentMissile->y + PLAYER_MISSILE_LENGTH, BLUE);
             }
             
         }

@@ -63,49 +63,27 @@ void deleteNode(DLinkedList *dLinkedList, LLNode *Node) {
    * TODO: Implement the method as described in the header file 
    *    to delete a node from the DLL
    */
-
     // HINT: Remember to free memory that would have been allocated
-    int index = 0;
-    if (dLinkedList == NULL) {
+    if (dLinkedList == NULL || Node == NULL) {
         return;
     }
     LLNode *tempNode = dLinkedList->head;
-    while (index < dLinkedList->size) {
-        if (tempNode == Node) {
-            if (index == 0) {
-                dLinkedList->head = dLinkedList->head->next;
-                if (dLinkedList->head->next == NULL) {
-                    dLinkedList->tail = NULL;
-                } else {
-                    dLinkedList->head->prev = NULL;
-                }
-                free(tempNode);
-                dLinkedList->size--;
-                return;
-            } else if (index == dLinkedList->size - 1) {
-                dLinkedList->tail = dLinkedList->tail->prev;
-                if (dLinkedList->tail == NULL) {
-                    dLinkedList->head = NULL;
-                } else {
-                    dLinkedList->tail-> next = NULL; 
-                }
-                free(tempNode);
-                dLinkedList->size--;
-                return;
-            } else {
-                tempNode->prev->next = tempNode->next;
-                tempNode->next->prev = tempNode->prev;
-                free(tempNode);
-                dLinkedList->size--;
-                return;
-            }
-        } else {
-            index++;
-            tempNode = tempNode->next;
-        }
+    if (Node->prev != NULL) {
+        Node->prev->next = Node->next;
+    } else {
+        dLinkedList->head = Node->next;
     }
-    return;
-
+    if (Node->next != NULL) {
+        Node->next->prev = Node->prev;
+    } else {
+        dLinkedList->tail = Node->prev;
+    }
+    free(Node);
+    dLinkedList->size--;
+    if (dLinkedList->size == 0) {
+        dLinkedList->head = NULL;
+        dLinkedList->tail = NULL;
+    }
 
 }
 

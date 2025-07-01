@@ -65,7 +65,7 @@ void missile_create(void){
     newMissile->x = newMissile->source_x;
     //  HINT: Keep in mind the width of the screen SIZE_X, and 
     //      set the x-coord of the missle
-    
+   newMissile->target_x = rand() % SIZE_X;
     // 4. Set the active status of the missile and 
     newMissile->status = MISSILE_ACTIVE;
     // 5. each missile has its own tick
@@ -85,7 +85,6 @@ void missile_update_position(void){
 
     // 1. Init a missile and define how fast the missile will move. 
     //  You might also want to define dx, dy for the missile
-    MISSILE* newMissile = (MISSILE *)malloc(sizeof(MISSILE)); 
     // 2. Loop through all the missiles
     //      2a. If the missile's status is MISSILE_EXPLODED
     //          2a1. Erase missile by drawing a blank missile on current 

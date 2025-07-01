@@ -44,6 +44,8 @@ extern DigitalOut MBEDLED4;
 
 #define BACKGROUND_COLOR 0x000000 //black
 
+#define PLAYER_MISSILE_LENGTH 18
+
 #define STATUS_BAR_HEIGHT 7         // Height of status bar
 #define DIST_MISSLE_EXPLOSION 10    // Missle explosion distance
 #define LANDSCAPE_HEIGHT 4          // Pixel count for landscape at bottom of screen for the city
