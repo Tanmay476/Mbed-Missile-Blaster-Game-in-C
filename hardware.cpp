@@ -81,6 +81,8 @@ GameInputs read_inputs() {
     in.ns_right = !navs.right();
     in.ns_up = navs.up();
     in.ns_down = !navs.down();
+    in.ns_center = !navs.center();
+
 
   // 2b. (Alternative) Read joystick values from in.
   //   Hint: Low voltage means "pressed"

@@ -96,11 +96,13 @@ void missile_update_position(void){
     //          2b3. Update missile's internal tick
 
     LLNode *currNode = missileDLL->head;
+    LLNode *nextNode = NULL;
     while (currNode != NULL) {
         MISSILE* currentMissile = (MISSILE*)(currNode->data);
+        nextNode = currNode->next;
         if (currentMissile->status == MISSILE_EXPLODED) {
             missile_draw(currentMissile, BLACK);
-            free(currNode);
+            free(currentMissile);
             deleteNode(missileDLL, currNode);
         } else {
              missile_draw(currentMissile, BLACK);
@@ -108,7 +110,7 @@ void missile_update_position(void){
              currentMissile->x = currentMissile->source_x +
                                 (currentMissile->y * (float)(currentMissile->target_x - currentMissile->source_x) / SIZE_Y);
             if (currentMissile->y >= SIZE_Y) {
-                free(currNode); 
+                free(currentMissile); 
                 deleteNode(missileDLL, currNode);
             } else {
                 missile_draw(currentMissile, MISSILE_COLOR);
@@ -116,7 +118,7 @@ void missile_update_position(void){
             }
 
         }
-        currNode = currNode->next;
+        currNode = nextNode;
     }
 
 }

@@ -214,8 +214,9 @@ int get_action(GameInputs in) {
   } else if (in.b1 || in.ns_left) {
       return GO_LEFT;
   }
-  if (in.b3) {
+  if (in.b3 || in.ns_down) {
       return BUTTON_X;
+      pc.printf("button 3 pressed !!!!!!");
   }
 
   // 2. Check your navigation switch and return the corresponding direction value

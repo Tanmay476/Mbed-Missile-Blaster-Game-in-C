@@ -108,7 +108,6 @@ void player_missile_draw(void) {
 #endif
     //new
   // 1. Initialize the missile
-    MISSILE* tempMissile = (MISSILE *)malloc(sizeof(MISSILE));
     
   // 2. Looping through all player missiles
   //      2a. If missile status is MISSLE_EXPLODED
@@ -121,24 +120,26 @@ void player_missile_draw(void) {
   //        To draw the missile, you can use the uLCD.line(). A similar library
   //              is used in missile.cpp
     LLNode *currNode = player.playerMissiles->head;
+    LLNode *nextNode = NULL; //new node
     while (currNode != NULL) {
         MISSILE* currentMissile = (MISSILE*)(currNode->data);
+        nextNode = currNode->next;
         if (currentMissile->status == MISSILE_EXPLODED) {
                 missile_draw(currentMissile, BLACK);
-                free(currNode); 
+                free(currentMissile); 
                 deleteNode(player.playerMissiles, currNode);
         } else {
             missile_draw(currentMissile, BLACK);
             currentMissile->y += MISSILE_SPEED; 
-            if(currentMissile->y < 0 || currentMissile->y > 128) {
-                free(currNode); 
+            if(currentMissile->y < 0) {
+                free(currentMissile); 
                 deleteNode(player.playerMissiles, currNode);
             } else {
                 missile_draw(currentMissile, BLUE);
             }
             
         }
-        currNode = currNode->next;
+        currNode = nextNode;
     }
   
 }
