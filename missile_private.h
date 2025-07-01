@@ -16,8 +16,8 @@
 #include "missile_public.h"
 
 //==== [private settings] ====
-#define  MISSILE_INTERVAL  10
-#define  MISSILE_SPEED  6
+extern int  MISSILE_INTERVAL;
+extern int  MISSILE_SPEED;
 #define MISSILE_COLOR    0xFF0000
 
 //==== [private type] ====

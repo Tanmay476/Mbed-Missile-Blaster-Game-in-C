@@ -14,6 +14,8 @@
 #include "missile_public.h"
 
 int missile_tick=0;
+int MISSILE_INTERVAL = 10; // Initial default value
+int MISSILE_SPEED = 6;    // Initial default value
 
 //Create a DLL for missiles
 DLinkedList* missileDLL = NULL;
@@ -94,10 +96,27 @@ void missile_update_position(void){
     //          2b3. Update missile's internal tick
 
     LLNode *currNode = missileDLL->head;
-    int index = 0;
-    while (index < missileDLL->size) {
+    while (currNode != NULL) {
         MISSILE* currentMissile = (MISSILE*)(currNode->data);
-                                                                                                                                                                                                                                                                                                                                    
+        if (currentMissile->status == MISSILE_EXPLODED) {
+            missile_draw(currentMissile, BLACK);
+            free(currentMissile);
+            deleteNode(missileDLL, currNode);
+        } else {
+             missile_draw(currentMissile, BLACK);
+             currentMissile->y += MISSILE_SPEED;
+             currentMissile->x = currentMissile->source_x +
+                                (currentMissile->y * (float)(currentMissile->target_x - currentMissile->source_x) / SIZE_Y);
+            if (currentMissile->y >= SIZE_Y) {
+                free(currentMissile); 
+                deleteNode(missileDLL, currNode);
+            } else {
+                missile_draw(currentMissile, MISSILE_COLOR);
+                currentMissile->tick++;
+            }
+
+        }
+        currNode = currNode->next;
     }
 
 }
@@ -115,7 +134,7 @@ void set_missile_speed(int speed){
     ASSERT_P(speed>=1 && speed<=8,ERROR_MISSILE_SPEED);
 
     // 1. Set the speed of the missile by setting MISSILE_SPEED as defined
-  //  MISSILE_SPEED = speed;
+    MISSILE_SPEED = speed;
 }
 
 /**
@@ -131,7 +150,7 @@ void set_missile_interval(int interval){
    // ASSERT_P(interval>=1 && interval<=100,ERROR_MISSILE_INTERVAL);
 
     // 1. Set the interval of the missile by setting MISSLE_INTERVAL as defined
-  //  MISSILE_INTERVAL = interval;
+    MISSILE_INTERVAL = interval;
 
 }
 
@@ -145,7 +164,7 @@ DLinkedList* get_missile_list() {
 #endif
 
     // 1. Return the DLL object that holds missiles.
-   // return missileDLL;
+    return missileDLL;
     
 }
 

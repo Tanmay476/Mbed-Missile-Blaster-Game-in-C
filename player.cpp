@@ -121,28 +121,24 @@ void player_missile_draw(void) {
   //        To draw the missile, you can use the uLCD.line(). A similar library
   //              is used in missile.cpp
     LLNode *currNode = player.playerMissiles->head;
-    int index = 0;
-    while (index < player.playerMissiles->size) {
+    while (currNode != NULL) {
         MISSILE* currentMissile = (MISSILE*)(currNode->data)
         if (currentMissile->status == MISSILE_EXPLODED) {
                 missile_draw(currentMissile, BLACK);
-                LLNode *nodeToDelete = currNode; 
-                currNode = currNode->next;
+                free(currentMissile); 
                 deleteNode(player.playerMissiles, nodeToDelete);
         } else {
             missile_draw(currentMissile, BLACK);
             currentMissile->y += MISSILE_PLAYER_SPEED; 
             if(currentMissile-y < 0 || currentMissile->y > SIZE_Y) {
-                LLNode *nodeToDelete = currNode;
-                currNode = currNode->next;
+                free(currentMissile); 
                 deleteNode(player.playerMissiles, nodeToDelete);
             } else {
                 missile_draw(currentMissile, BLUE);
-                currNode = currNode->next;
-                index++;
             }
             
         }
+        currNode = currNode->next;
     }
   
 }
