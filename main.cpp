@@ -491,8 +491,12 @@ int who_got_hit(int missile_x) {
     //     2b. Return the index of the city if it was hit.
     // 3. If none is found, return -1.
     for (int i = 0; i< MAX_NUM_CITY) {
-        CITY curr = city_record[i];
-        
+        CITY current_city = city_record[i]; 
+        if (current_city.status == EXIST) {
+            
+
+        }
+
 
     }
 
