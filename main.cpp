@@ -10,11 +10,13 @@
 
 // External libs
 #include <stdlib.h>
+#include <math.h>
 
 // Project includes
 #include "globals.h"
 #include "hardware.h"
 #include "city_landscape_public.h"
+#include "missile_private.h"
 #include "missile_public.h"
 #include "player_public.h"
 
@@ -41,6 +43,7 @@ int update_city_landscape(void);
 int who_got_hit(int missile_x);
 void playSound(char * wav);
 void playNotes(void);
+void advance_level(void);
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -209,6 +212,9 @@ int get_action(GameInputs in) {
     pc.printf("[F] get_action()\r\n");
 #endif
   // 1. Check your button inputs and return the corresponding action value
+  if (in.b1 && in.b2) {
+      return LEVEL_ADVANCE;
+  }
   if (in.b2 || in.ns_up) {
       return GO_RIGHT;
   } else if (in.b1 || in.ns_left) {
@@ -269,11 +275,14 @@ int perform_action(int action) {
              player_fire();
             return ACTED;
 
+        case LEVEL_ADVANCE:
+            advance_level();
+            return ACTED;
+
     }
 
     return NO_RESULT;
 }
-
 /**
  * UPDATE_GAME
  *
@@ -322,6 +331,14 @@ int update_game(PLAYER player) {
 }
 
 /**
+* 
+* Update the information for the game
+*/
+void advance_level(void) {
+    MISSILE_SPEED += 3;
+    MISSILE_INTERVAL -= 3;
+}
+/**
  * MISSLE_DISTANCE
  *
  * TODO:
@@ -338,7 +355,11 @@ int missile_distance(int x1, int y1, int x2, int y2) {
 #endif
     // 1. Compute and return the euclidean distance between two 
     //      points (x1,y1) and (x2,y2).
-
+    int dx = x2 - x1;
+    int dy = y2 - y1;
+    int x_squared = dx * dx;
+    int y_squared = dy * dy;
+    return (int) (sqrt((double)(x_squared + y_squared)));
 }
 
 /**
@@ -362,6 +383,29 @@ void missile_contact(void) {
     //      2d. If the distance is below the threshold of DIST_MISSILE_EXPLOSION,
     //          2d1. Both the player missile and enemy will explode, so update their status
     //                  This might impact the score for the player.
+
+    DLinkedList* playerMissiles = player_get_info().playerMissiles;
+    DLinkedList* enemyMissiles = get_missile_list();
+    LLNode* currPlayMissile  = playerMissiles->head;
+    //LLNode* currEnMissile  = enemyMissiles->head;
+    while (currPlayMissile != NULL) {
+        MISSILE* currPlayer = (MISSILE*) currPlayMissile->data;
+        if (currPlayer->status == MISSILE_ACTIVE) {
+            LLNode* currEnMissile = enemyMissiles->head; 
+
+            while (currEnMissile != NULL) {
+                MISSILE* currEnemy = (MISSILE*)(currEnMissile->data);
+                if (missile_distance(currPlayer->x, currPlayer->y, currEnemy->x, currEnemy->y) <= DIST_MISSILE_EXPLOSION) {
+                    currEnemy->status = MISSILE_EXPLODED;
+                    currPlayer->status = MISSILE_EXPLODED;
+                    player_update_score(MISSILE_HIT_POINTS);
+                }
+                currEnMissile = currEnMissile->next;
+            }
+            currPlayMissile = currPlayMissile->next;
+        }
+    }
+
 
 
 }

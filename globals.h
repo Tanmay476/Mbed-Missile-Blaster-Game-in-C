@@ -66,6 +66,11 @@ extern DigitalOut MBEDLED4;
 #define GO_UP 7
 #define GO_DOWN 8
 
+#define LEVEL_ADVANCE 9
+#define MISSILE_HIT_POINTS 10
+#define DIST_MISSILE_EXPLOSION 10
+
+
 #define PLAYER_HIT 1
 #define NO_CITY_HIT -1
 
