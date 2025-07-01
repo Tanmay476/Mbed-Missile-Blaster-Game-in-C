@@ -13,6 +13,7 @@
 #include <math.h>
 
 // Project includes
+#include "doubly_linked_list.h"
 #include "globals.h"
 #include "hardware.h"
 #include "city_landscape_public.h"
@@ -431,7 +432,6 @@ int update_city_landscape(void){
     // 3. Return the number of city left.
 
 
-
     PLAYER player = player_get_info();
     return player.num_city;
 }
@@ -454,7 +454,22 @@ int was_player_hit() {
     //      2b. If missile hits player, the player is destroyed. Check player_destroy()
     //      2c. The missile also explodes, so update accordingly.
     // 3. Return the status of the player being hit by a missile. Check PLAYER_HIT.
-
+    DLinkedList* enemyMissiles = get_missile_list();
+    LLNode* curr  = enemyMissiles->head;
+    LLNode* nextNode = NULL;
+    while (curr != NULL) {
+        MISSILE* currMissile= (MISSILE*) curr->data;
+        nextNode = curr->next;
+        if (currMissile->status == MISSILE_ACTIVE) { 
+            
+            if (missile_distance(currMissile->x, currMissile->y, player.x, player.y) <= DIST_MISSILE_EXPLOSION) {
+                player_destroy(); 
+                currMissile->status = MISSILE_EXPLODED; 
+                return PLAYER_HIT;
+         }
+         curr = nextNode;
+    }
+    return NO_RESULT;
 
 }
 
