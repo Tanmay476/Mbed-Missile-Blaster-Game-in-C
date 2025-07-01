@@ -32,12 +32,14 @@ void missile_generator(void){
 #endif
 
     // 1. Update the missile's tick
-//    missile_tick++;
+    missile_tick++;
     // 2. Create a missile on every interval defined by MISSILE_INTERVAL
     // HINT: Only fire the missile at certain ticks
-    
+    if (missile_tick%(MISSILE_INTERVAL) == 0) {
+        missile_create();
+    }
     // 3. Update missle positions. HINT: Take a look at missile_update_position()
-
+    missile_update_position();
 }
 
 /**
@@ -50,9 +52,10 @@ void missile_create(void){
 #endif
 
     // 1. Initialize the missile
+    MISSILE* newMissile = (MISSILE *)malloc(sizeof(MISSILE));
 
     // 2. The missile starts at the top of the screen
-
+    newMissile-> = 
     // 3. Randomly set a missile source_x and target_x
     //  HINT: Keep in mind the width of the screen SIZE_X, and 
     //      set the x-coord of the missle
