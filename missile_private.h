@@ -21,7 +21,7 @@
 #define MISSILE_COLOR    0xFF0000
 
 //==== [private type] ====
-
+//new update
 //==== [private function] ====
 void missile_create(void);
 void missile_update_position(void);
