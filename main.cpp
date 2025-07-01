@@ -317,13 +317,14 @@ int update_game(PLAYER player) {
     // 3. Update the city landscape. If an enemy missile hits a the city,
     //      you want to update the count and other related things.
     //      HINT: It would be useful to implement update_city_landscape()
+    update_city_landscape();
     
     // 4. Check if the player is hit by an enemy missile.
     //      HINT: It would be useful to implement was_player_hit()
-    
+    was_player_hit();
     // 5. Compute player missile colliding/destroying enemy missile on contact.
     //      HINT: It would be useful to implement missile_contact()
-
+    missile_contact();
     // 6. Check for game status from city remaining, player hit. Return GAME_OVER
     //      if no cities are remaining or if player is hit.
 
@@ -399,6 +400,9 @@ void missile_contact(void) {
                 if (missile_distance(currPlayer->x, currPlayer->y, currEnemy->x, currEnemy->y) <= DIST_MISSILE_EXPLOSION) {
                     currEnemy->status = MISSILE_EXPLODED;
                     currPlayer->status = MISSILE_EXPLODED;
+                    uLCD.filled_circle(currPlayer->x, currPlayer->y, 2, YELLOW);
+                    wait(0.05);
+                    uLCD.filled_circle(currPlayer->x, currPlayer->y, 2, BLACK);
                     player_update_score(MISSILE_HIT_POINTS);
                 }
                 currEnMissile = currEnMissile->next;
@@ -431,9 +435,45 @@ int update_city_landscape(void){
     //     2c. If the missile hits the ground and not city, the missile explodes
     // 3. Return the number of city left.
 
+    DLinkedList* missiles = get_missile_list();
+    LLNode* curr  = missiles->head;
+    LLNode* nextNode = NULL;
+    while (curr != NULL) {
+        MISSILE* currMissile= (MISSILE*) curr->data;
+        nextNode = curr->next;
+        if (currMissile->status == MISSILE_ACTIVE) {
+            if (currMissile->y >= CITY_UPPER_BOUND) {
+                 int hit_city_index = who_got_hit(currMissile->x);
+                if (hit_city_index != -1) {
+                    city_demolish(hit_city_index);
+                    player_update_city();
+                    currMissile->status = MISSILE_EXPLODED;
+                    uLCD.filled_circle(currMissile->x, currMissile->y, 2, YELLOW);
+                    wait(0.05);
+                    uLCD.filled_circle(currMissile->x, currMissile->y, 2, BLACK);
 
-    PLAYER player = player_get_info();
-    return player.num_city;
+                } else if (currMissile->y >= (SIZE_Y - LANDSCAPE_HEIGHT)) { 
+                    currMissile->status = MISSILE_EXPLODED; 
+                    uLCD.filled_circle(currMissile->x, currMissile->y, 2, YELLOW);
+                    wait(0.05);
+                    uLCD.filled_circle(currMissile->x, currMissile->y, 2, BLACK);
+
+                }
+            }
+        }
+        curr = nextNode;
+    }
+    int cities_remaining = 0;
+
+    for (int i = 0; i < MAX_NUM_CITY; i++) {
+        if (city_record[i].status == EXIST) {
+            cities_remaining++;
+        }
+    }
+    
+    
+    // Return the actual count of cities remaining
+    return cities_remaining; // FIX: Return the calculated count
 }
 
 /**
@@ -465,6 +505,9 @@ int was_player_hit() {
             if (missile_distance(currMissile->x, currMissile->y, player_get_info().x, player_get_info().y) <= DIST_MISSILE_EXPLOSION) {
                     player_destroy(); 
                     currMissile->status = MISSILE_EXPLODED; 
+                    uLCD.filled_circle(currMissile->x, currMissile->y, 2, YELLOW);
+                    wait(0.05);
+                    uLCD.filled_circle(currMissile->x, currMissile->y, 2, BLACK);
                     return PLAYER_HIT;
             }
         }
@@ -490,16 +533,16 @@ int who_got_hit(int missile_x) {
     //     2a. Check if the exact city at this index was hit. NOTE: We alsoready know a city was hit (y-axis wise)
     //     2b. Return the index of the city if it was hit.
     // 3. If none is found, return -1.
-    for (int i = 0; i< MAX_NUM_CITY) {
+    for (int i = 0; i< MAX_NUM_CITY; i++) {
         CITY current_city = city_record[i]; 
         if (current_city.status == EXIST) {
-            
+            if (missile_x >= current_city.x && missile_x < (current_city.x + current_city.width)) {
+                return i;
+            }
 
         }
-
-
     }
-
+    return -1;
 
 }
 

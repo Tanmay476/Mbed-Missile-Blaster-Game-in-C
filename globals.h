@@ -43,6 +43,7 @@ extern DigitalOut MBEDLED4;
 #define PI 3.1415926
 
 #define BACKGROUND_COLOR 0x000000 //black
+#define YELLOW 0xFFFF00 //yellow
 
 #define PLAYER_MISSILE_LENGTH 18
 

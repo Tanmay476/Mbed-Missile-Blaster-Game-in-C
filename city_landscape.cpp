@@ -1,4 +1,25 @@
+//=================================================================
+// The file is for module "city landscape"
+//
+// Copyright 2021 Georgia Tech.  All rights reserved.
+// The materials provided by the instructor in this course are for
+// the use of the students currently enrolled in the course.
+// Copyrighted course materials may not be further disseminated.
+// This file must not be made publicly available anywhere.
+//==================================================================
 
+#include "city_landscape_private.h"
+
+CITY city_record[MAX_NUM_CITY];
+int building_height[NUM_BUILDING];
+
+
+/**
+ * TODO:
+ * See the comments in city_landscape_public.h
+ * @param num_city is the number of city desired
+ */
+void city_landscape_init(int num_city) {
 #ifdef F_DEBUG
   pc.printf("[F] city_landscape_init()\r\n");
 #endif 
@@ -81,8 +102,9 @@ void city_demolish(int index){
             city_record[index].y,
             city_record[index].x + city_record[index].width - 1,
             city_record[index].y - city_record[index].height + 1,
-            LANDSCAPE_COLOR
+            BLACK
         );
+
     }
 }
 

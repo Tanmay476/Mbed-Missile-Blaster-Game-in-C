@@ -28,6 +28,9 @@ typedef struct {
 
 #define MAX_NUM_CITY 6
 
+extern CITY city_record[MAX_NUM_CITY]; // <--- ADD THIS LINE!
+
+
 /** Call city_landscape_init() only once at the begining of your code
     @param num_city number of cities to be drawn. It must be less/equal to MAX_NUM_CITY.
 */
