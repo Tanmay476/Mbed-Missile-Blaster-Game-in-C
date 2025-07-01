@@ -462,15 +462,15 @@ int was_player_hit() {
         nextNode = curr->next;
         if (currMissile->status == MISSILE_ACTIVE) { 
             
-            if (missile_distance(currMissile->x, currMissile->y, player.x, player.y) <= DIST_MISSILE_EXPLOSION) {
-                player_destroy(); 
-                currMissile->status = MISSILE_EXPLODED; 
-                return PLAYER_HIT;
-         }
-         curr = nextNode;
+            if (missile_distance(currMissile->x, currMissile->y, player_get_info().x, player_get_info().y) <= DIST_MISSILE_EXPLOSION) {
+                    player_destroy(); 
+                    currMissile->status = MISSILE_EXPLODED; 
+                    return PLAYER_HIT;
+            }
+        }
+    curr = nextNode;
     }
     return NO_RESULT;
-
 }
 
 /**
