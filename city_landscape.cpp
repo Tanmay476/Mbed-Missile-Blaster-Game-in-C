@@ -97,7 +97,7 @@ void draw_cities(void){
 }
 
 /**
- * Draws the landscape of the cities.
+ * Draws the landscape of the cities..
  */
 void draw_landscape(void){
 #ifdef F_DEBUG
