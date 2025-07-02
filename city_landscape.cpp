@@ -81,32 +81,34 @@ CITY city_get_info(int index){
  * @param index of the city to be demoolished,
  */
 void city_demolish(int index) {
-#ifdef F_DEBUG
-    pc.printf("[F] city_demolish()\r\n");
-#endif
     ASSERT_P(index < MAX_NUM_CITY, ERROR_CITY_INDEX_DEMOLISH);
 
     if (city_record[index].status == EXIST) {
-        // Save the original height
+        // 1. grab original height
         int orig_h = city_record[index].height;
 
-        // 1. Erase the entire building graphic
+        // 2. compute our bottom/top in bottom-origin space
+        int x0 = city_record[index].x;
+        int y0 = city_record[index].y;
+        int x1 = x0 + city_record[index].width - 1;
+        int y1 = y0 + orig_h        - 1;   // top-edge of the building
+
+        // 3. overdraw the entire rectangle
         uLCD.filled_rectangle(
-            city_record[index].x,
-            city_record[index].y,
-            city_record[index].x + city_record[index].width - 1,
-            city_record[index].y - orig_h + 1,
-            BLACK
+            x0,
+            REVERSE_Y(y0),  // bottom (converted)
+            x1,
+            REVERSE_Y(y1),  // top    (converted)
+            LANDSCAPE_COLOR
         );
 
-        // 2. Update status
+        // 4. update status & clear data
         city_record[index].status = DEMOLISHED;
-
-        // 3. Remove the city data
         city_record[index].height = 0;
         building_height[index]    = 0;
     }
 }
+
 
 
 /**
