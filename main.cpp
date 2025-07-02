@@ -10,11 +10,14 @@
 
 // External libs
 #include <stdlib.h>
+#include <math.h>
 
 // Project includes
+#include "doubly_linked_list.h"
 #include "globals.h"
 #include "hardware.h"
 #include "city_landscape_public.h"
+#include "missile_private.h"
 #include "missile_public.h"
 #include "player_public.h"
 
@@ -41,6 +44,7 @@ int update_city_landscape(void);
 int who_got_hit(int missile_x);
 void playSound(char * wav);
 void playNotes(void);
+void advance_level(void);
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -209,11 +213,18 @@ int get_action(GameInputs in) {
     pc.printf("[F] get_action()\r\n");
 #endif
   // 1. Check your button inputs and return the corresponding action value
+  if (in.b1 && in.b2) {
+      return LEVEL_ADVANCE;
+  }
   if (in.b2 || in.ns_up) {
       return GO_RIGHT;
   } else if (in.b1 || in.ns_left) {
       return GO_LEFT;
-  } 
+  }
+  if (in.b3 || in.ns_down) {
+      return BUTTON_X;
+      pc.printf("button 3 pressed !!!!!!");
+  }
 
   // 2. Check your navigation switch and return the corresponding direction value
   //return new changes
@@ -262,13 +273,17 @@ int perform_action(int action) {
             /**
              * TODO: Performs a fire action. You might find it helpful to find player_fire().
              */
+             player_fire();
+            return ACTED;
+
+        case LEVEL_ADVANCE:
+            advance_level();
             return ACTED;
 
     }
 
     return NO_RESULT;
 }
-
 /**
  * UPDATE_GAME
  *
@@ -291,22 +306,25 @@ int update_game(PLAYER player) {
             player_moveRight();
         
     }
+    
     // 1. Generate and draw the enemy missiles.
+    missile_generator();
     //  HINT: Look at the Missile class
-
+    
     // 2. Draw the playyer's missile, as needed.
     //  HINT: Look at the Player class
-
+    player_missile_draw();
     // 3. Update the city landscape. If an enemy missile hits a the city,
     //      you want to update the count and other related things.
     //      HINT: It would be useful to implement update_city_landscape()
+    update_city_landscape();
     
     // 4. Check if the player is hit by an enemy missile.
     //      HINT: It would be useful to implement was_player_hit()
-    
+    was_player_hit();
     // 5. Compute player missile colliding/destroying enemy missile on contact.
     //      HINT: It would be useful to implement missile_contact()
-
+    missile_contact();
     // 6. Check for game status from city remaining, player hit. Return GAME_OVER
     //      if no cities are remaining or if player is hit.
 
@@ -314,6 +332,14 @@ int update_game(PLAYER player) {
     return NO_RESULT;
 }
 
+/**
+* 
+* Update the information for the game
+*/
+void advance_level(void) {
+    MISSILE_SPEED += 3;
+    MISSILE_INTERVAL -= 3;
+}
 /**
  * MISSLE_DISTANCE
  *
@@ -331,7 +357,11 @@ int missile_distance(int x1, int y1, int x2, int y2) {
 #endif
     // 1. Compute and return the euclidean distance between two 
     //      points (x1,y1) and (x2,y2).
-
+    int dx = x2 - x1;
+    int dy = y2 - y1;
+    int x_squared = dx * dx;
+    int y_squared = dy * dy;
+    return (int) (sqrt((double)(x_squared + y_squared)));
 }
 
 /**
@@ -356,6 +386,32 @@ void missile_contact(void) {
     //          2d1. Both the player missile and enemy will explode, so update their status
     //                  This might impact the score for the player.
 
+    DLinkedList* playerMissiles = player_get_info().playerMissiles;
+    DLinkedList* enemyMissiles = get_missile_list();
+    LLNode* currPlayMissile  = playerMissiles->head;
+    //LLNode* currEnMissile  = enemyMissiles->head;
+    while (currPlayMissile != NULL) {
+        MISSILE* currPlayer = (MISSILE*) currPlayMissile->data;
+        if (currPlayer->status == MISSILE_ACTIVE) {
+            LLNode* currEnMissile = enemyMissiles->head; 
+
+            while (currEnMissile != NULL) {
+                MISSILE* currEnemy = (MISSILE*)(currEnMissile->data);
+                if (missile_distance(currPlayer->x, currPlayer->y, currEnemy->x, currEnemy->y) <= DIST_MISSILE_EXPLOSION) {
+                    currEnemy->status = MISSILE_EXPLODED;
+                    currPlayer->status = MISSILE_EXPLODED;
+                    uLCD.filled_circle(currPlayer->x, currPlayer->y, 2, YELLOW);
+                    wait(0.05);
+                    uLCD.filled_circle(currPlayer->x, currPlayer->y, 2, BLACK);
+                    player_update_score(MISSILE_HIT_POINTS);
+                }
+                currEnMissile = currEnMissile->next;
+            }
+            currPlayMissile = currPlayMissile->next;
+        }
+    }
+
+
 
 }
 
@@ -379,10 +435,45 @@ int update_city_landscape(void){
     //     2c. If the missile hits the ground and not city, the missile explodes
     // 3. Return the number of city left.
 
+    DLinkedList* missiles = get_missile_list();
+    LLNode* curr  = missiles->head;
+    LLNode* nextNode = NULL;
+    while (curr != NULL) {
+        MISSILE* currMissile= (MISSILE*) curr->data;
+        nextNode = curr->next;
+        if (currMissile->status == MISSILE_ACTIVE) {
+            if (currMissile->y >= CITY_UPPER_BOUND) {
+                 int hit_city_index = who_got_hit(currMissile->x);
+                if (hit_city_index != -1) {
+                    city_demolish(hit_city_index);
+                    player_update_city();
+                    currMissile->status = MISSILE_EXPLODED;
+                    uLCD.filled_circle(currMissile->x, currMissile->y, 2, YELLOW);
+                    wait(0.05);
+                    uLCD.filled_circle(currMissile->x, currMissile->y, 2, BLACK);
 
+                } else if (currMissile->y >= (SIZE_Y - LANDSCAPE_HEIGHT)) { 
+                    currMissile->status = MISSILE_EXPLODED; 
+                    uLCD.filled_circle(currMissile->x, currMissile->y, 2, YELLOW);
+                    wait(0.05);
+                    uLCD.filled_circle(currMissile->x, currMissile->y, 2, BLACK);
 
-    PLAYER player = player_get_info();
-    return player.num_city;
+                }
+            }
+        }
+        curr = nextNode;
+    }
+    int cities_remaining = 0;
+
+    for (int i = 0; i < MAX_NUM_CITY; i++) {
+        if (city_record[i].status == EXIST) {
+            cities_remaining++;
+        }
+    }
+    
+    
+    // Return the actual count of cities remaining
+    return cities_remaining; // FIX: Return the calculated count
 }
 
 /**
@@ -403,8 +494,26 @@ int was_player_hit() {
     //      2b. If missile hits player, the player is destroyed. Check player_destroy()
     //      2c. The missile also explodes, so update accordingly.
     // 3. Return the status of the player being hit by a missile. Check PLAYER_HIT.
-
-
+    DLinkedList* enemyMissiles = get_missile_list();
+    LLNode* curr  = enemyMissiles->head;
+    LLNode* nextNode = NULL;
+    while (curr != NULL) {
+        MISSILE* currMissile= (MISSILE*) curr->data;
+        nextNode = curr->next;
+        if (currMissile->status == MISSILE_ACTIVE) { 
+            
+            if (missile_distance(currMissile->x, currMissile->y, player_get_info().x, player_get_info().y) <= DIST_MISSILE_EXPLOSION) {
+                    player_destroy(); 
+                    currMissile->status = MISSILE_EXPLODED; 
+                    uLCD.filled_circle(currMissile->x, currMissile->y, 2, YELLOW);
+                    wait(0.05);
+                    uLCD.filled_circle(currMissile->x, currMissile->y, 2, BLACK);
+                    return PLAYER_HIT;
+            }
+        }
+    curr = nextNode;
+    }
+    return NO_RESULT;
 }
 
 /**
@@ -424,6 +533,16 @@ int who_got_hit(int missile_x) {
     //     2a. Check if the exact city at this index was hit. NOTE: We alsoready know a city was hit (y-axis wise)
     //     2b. Return the index of the city if it was hit.
     // 3. If none is found, return -1.
+    for (int i = 0; i< MAX_NUM_CITY; i++) {
+        CITY current_city = city_record[i]; 
+        if (current_city.status == EXIST) {
+            if (missile_x >= current_city.x && missile_x < (current_city.x + current_city.width)) {
+                return i;
+            }
+
+        }
+    }
+    return -1;
 
 }
 

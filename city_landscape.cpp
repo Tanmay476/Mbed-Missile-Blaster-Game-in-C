@@ -86,28 +86,13 @@ void city_demolish(int index) {
 #endif
     ASSERT_P(index < MAX_NUM_CITY, ERROR_CITY_INDEX_DEMOLISH);
 
-    if (city_record[index].status == EXIST) {
-        // Save the original height
-        int orig_h = city_record[index].height;
-
-        // 1. Erase the entire building graphic
-        uLCD.filled_rectangle(
-            city_record[index].x,
-            city_record[index].y,
-            city_record[index].x + city_record[index].width - 1,
-            city_record[index].y - orig_h + 1,
-            LANDSCAPE_COLOR
-        );
-
-        // 2. Update status
-        city_record[index].status = DEMOLISHED;
-
-        // 3. Remove the city data
-        city_record[index].height = 0;
-        building_height[index]    = 0;
-    }
+    // 1. Remove the city 
+    // 2. Update the status of all that has happened
+    // 3. Erase the city. Note, you might also adjust demolishing 
+    //          partially (some buildings) on single impact
+    // Don't forget to check that specified index is within range.
+    
 }
-
 
 /**
  * TODO:

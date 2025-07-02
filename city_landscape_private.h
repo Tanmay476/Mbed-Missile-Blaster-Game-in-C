@@ -38,6 +38,11 @@
 #define BUILDING_COLOR 0x00FF00
 #define LANDSCAPE_COLOR 0xCCAA00
 
+#define CITY_HEIGHT 30          // Example: A default height for cities
+#define MIN_BUILDING_HEIGHT 10  // Example: Minimum height for random buildings
+#define CITY_COLOR 0x808080     // Example: A grey color for cities
+
+
 
 
 

@@ -11,8 +11,11 @@
 
 #include "missile_private.h"
 #include "doubly_linked_list.h"
+#include "missile_public.h"
 
 int missile_tick=0;
+int MISSILE_INTERVAL = 10; // Initial default value
+int MISSILE_SPEED = 6;    // Initial default value
 
 //Create a DLL for missiles
 DLinkedList* missileDLL = NULL;
@@ -55,17 +58,20 @@ void missile_create(void){
     MISSILE* newMissile = (MISSILE *)malloc(sizeof(MISSILE));
 
     // 2. The missile starts at the top of the screen
-    newMissile-> = 
+    newMissile->y = 0;
+    
     // 3. Randomly set a missile source_x and target_x
+    newMissile->source_x = rand() % SIZE_X; 
+    newMissile->x = newMissile->source_x;
     //  HINT: Keep in mind the width of the screen SIZE_X, and 
     //      set the x-coord of the missle
-    
+   newMissile->target_x = rand() % SIZE_X;
     // 4. Set the active status of the missile and 
-
+    newMissile->status = MISSILE_ACTIVE;
     // 5. each missile has its own tick
-    
+    newMissile->tick = 0;
     // 6. Insert missile into the appropriate container object.
-
+    insertHead(missileDLL, newMissile);
 }
 
 /**
@@ -79,7 +85,6 @@ void missile_update_position(void){
 
     // 1. Init a missile and define how fast the missile will move. 
     //  You might also want to define dx, dy for the missile
-    
     // 2. Loop through all the missiles
     //      2a. If the missile's status is MISSILE_EXPLODED
     //          2a1. Erase missile by drawing a blank missile on current 
@@ -88,6 +93,32 @@ void missile_update_position(void){
     //          2b1. Erase missile by drawing a blank missile on current position
     //          2b2. Update missile position and draw at new position
     //          2b3. Update missile's internal tick
+
+    LLNode *currNode = missileDLL->head;
+    LLNode *nextNode = NULL;
+    while (currNode != NULL) {
+        MISSILE* currentMissile = (MISSILE*)(currNode->data);
+        nextNode = currNode->next;
+        if (currentMissile->status == MISSILE_EXPLODED) {
+            missile_draw(currentMissile, BLACK);
+            free(currentMissile);
+            deleteNode(missileDLL, currNode);
+        } else {
+             missile_draw(currentMissile, BLACK);
+             currentMissile->y += MISSILE_SPEED;
+             currentMissile->x = currentMissile->source_x +
+                                (currentMissile->y * (float)(currentMissile->target_x - currentMissile->source_x) / SIZE_Y);
+            if (currentMissile->y >= SIZE_Y) {
+                free(currentMissile); 
+                deleteNode(missileDLL, currNode);
+            } else {
+                missile_draw(currentMissile, MISSILE_COLOR);
+                currentMissile->tick++;
+            }
+
+        }
+        currNode = nextNode;
+    }
 
 }
 
@@ -104,7 +135,7 @@ void set_missile_speed(int speed){
     ASSERT_P(speed>=1 && speed<=8,ERROR_MISSILE_SPEED);
 
     // 1. Set the speed of the missile by setting MISSILE_SPEED as defined
-  //  MISSILE_SPEED = speed;
+    MISSILE_SPEED = speed;
 }
 
 /**
@@ -120,7 +151,7 @@ void set_missile_interval(int interval){
    // ASSERT_P(interval>=1 && interval<=100,ERROR_MISSILE_INTERVAL);
 
     // 1. Set the interval of the missile by setting MISSLE_INTERVAL as defined
-  //  MISSILE_INTERVAL = interval;
+    MISSILE_INTERVAL = interval;
 
 }
 
@@ -134,7 +165,7 @@ DLinkedList* get_missile_list() {
 #endif
 
     // 1. Return the DLL object that holds missiles.
-   // return missileDLL;
+    return missileDLL;
     
 }
 

@@ -43,6 +43,9 @@ extern DigitalOut MBEDLED4;
 #define PI 3.1415926
 
 #define BACKGROUND_COLOR 0x000000 //black
+#define YELLOW 0xFFFF00 //yellow
+
+#define PLAYER_MISSILE_LENGTH 18
 
 #define STATUS_BAR_HEIGHT 7         // Height of status bar
 #define DIST_MISSLE_EXPLOSION 10    // Missle explosion distance
@@ -63,6 +66,11 @@ extern DigitalOut MBEDLED4;
 #define GO_RIGHT 6
 #define GO_UP 7
 #define GO_DOWN 8
+
+#define LEVEL_ADVANCE 9
+#define MISSILE_HIT_POINTS 10
+#define DIST_MISSILE_EXPLOSION 10
+
 
 #define PLAYER_HIT 1
 #define NO_CITY_HIT -1

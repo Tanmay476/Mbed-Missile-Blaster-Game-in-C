@@ -91,9 +91,14 @@ void player_fire() {
 
   // 1. Initialize a missile from the player's current position
    MISSILE* tempMissile = (MISSILE *)malloc(sizeof(MISSILE));
-    tempMissile->source_x = player.x;
+    tempMissile->source_x = player.x + player.width/2;
+    
+    tempMissile->x = tempMissile->source_x;
+    tempMissile->y = player.y;
+    tempMissile->target_x = tempMissile->source_x;
   // 2. Set the status of the missile from player
     tempMissile->status = MISSILE_ACTIVE;
+    tempMissile->tick = 0;
   // 3. Add new missile to appropriate DLL object
   insertHead(player.playerMissiles, tempMissile);
 }
@@ -108,7 +113,6 @@ void player_missile_draw(void) {
 #endif
     //new
   // 1. Initialize the missile
-    MISSILE* tempMissile = (MISSILE *)malloc(sizeof(MISSILE));
     
   // 2. Looping through all player missiles
   //      2a. If missile status is MISSLE_EXPLODED
@@ -121,28 +125,27 @@ void player_missile_draw(void) {
   //        To draw the missile, you can use the uLCD.line(). A similar library
   //              is used in missile.cpp
     LLNode *currNode = player.playerMissiles->head;
-    int index = 0;
-    while (index < player.playerMissiles->size) {
-        MISSILE* currentMissile = (MISSILE*)(currNode->data)
+    LLNode *nextNode = NULL; //new node
+    while (currNode != NULL) {
+        MISSILE* currentMissile = (MISSILE*)(currNode->data);
+        nextNode = currNode->next;
+        uLCD.line(currentMissile->x, currentMissile->y,
+                          currentMissile->x, currentMissile->y + PLAYER_MISSILE_LENGTH, BLACK);
         if (currentMissile->status == MISSILE_EXPLODED) {
-                missile_draw(currentMissile, BLACK);
-                LLNode *nodeToDelete = currNode; 
-                currNode = currNode->next;
-                deleteNode(player.playerMissiles, nodeToDelete);
+                free(currentMissile); 
+                deleteNode(player.playerMissiles, currNode);
         } else {
-            missile_draw(currentMissile, BLACK);
-            currentMissile->y += MISSILE_PLAYER_SPEED; 
-            if(currentMissile-y < 0 || currentMissile->y > SIZE_Y) {
-                LLNode *nodeToDelete = currNode;
-                currNode = currNode->next;
-                deleteNode(player.playerMissiles, nodeToDelete);
+            currentMissile->y -= MISSILE_SPEED; 
+            if(currentMissile->y + PLAYER_MISSILE_LENGTH < 0) {
+                free(currentMissile); 
+                deleteNode(player.playerMissiles, currNode);
             } else {
-                missile_draw(currentMissile, BLUE);
-                currNode = currNode->next;
-                index++;
+                uLCD.line(currentMissile->x, currentMissile->y,
+                          currentMissile->x, currentMissile->y + PLAYER_MISSILE_LENGTH, BLUE);
             }
             
         }
+        currNode = nextNode;
     }
   
 }
