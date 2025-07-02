@@ -62,6 +62,7 @@ void advance_level(void);
  */
 int main()
 {
+
     // First things first: initialize hardware
     ASSERT_P(hardware_init() == ERROR_NONE, "Hardware init failed!");
 
@@ -215,8 +216,8 @@ int get_action(GameInputs in) {
     pc.printf("[F] get_action()\r\n");
 #endif 
   // 1. Check your button inputs and return the corresponding action value
-  if (player_get_info().score%10 == 0 || (in.b1 && in.b2)) {
-        DIST_MISSLE_EXPLOSION-=2;
+  if (player_get_info().score != 0 && player_get_info().score%100 == 0 || (in.b1 && in.b2)) {
+        DIST_MISSILE_EXPLOSION-=2;
       return LEVEL_ADVANCE;
   }
   if (in.b2 || in.ns_up) {
@@ -303,13 +304,6 @@ int update_game(PLAYER player) {
     pc.printf("[F] update_game()\r\n");
 #endif
 
-    if (!GO_LEFT) {
-            player_moveLeft();
-    }
-    if (!GO_RIGHT) {
-            player_moveRight();
-        
-    }
 
     
     // 1. Generate and draw the enemy missiles.

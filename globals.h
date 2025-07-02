@@ -38,7 +38,7 @@ extern DigitalOut MBEDLED3;
 extern DigitalOut MBEDLED4;
 
 // === [global settings] ===
-extern int DIST_MISSLE_EXPLOSION;
+extern int DIST_MISSILE_EXPLOSION;
 
 #define F_DEBUG   1                     // Debug flag
 
