@@ -48,7 +48,6 @@ extern DigitalOut MBEDLED4;
 #define PLAYER_MISSILE_LENGTH 18
 
 #define STATUS_BAR_HEIGHT 7         // Height of status bar
-#define DIST_MISSLE_EXPLOSION 10    // Missle explosion distance
 #define LANDSCAPE_HEIGHT 4          // Pixel count for landscape at bottom of screen for the city
 #define MAX_BUILDING_HEIGHT 10      // Pixel count for height of city buildings
 #define CITY_HIT_MARGIN 1           // Pixel count for hit margin around building in city
@@ -69,7 +68,6 @@ extern DigitalOut MBEDLED4;
 
 #define LEVEL_ADVANCE 9
 #define MISSILE_HIT_POINTS 10
-#define DIST_MISSILE_EXPLOSION 10
 
 
 #define PLAYER_HIT 1

@@ -96,7 +96,7 @@ void city_demolish(int index) {
             city_record[index].y,
             city_record[index].x + city_record[index].width - 1,
             city_record[index].y - orig_h + 1,
-            LANDSCAPE_COLOR
+            BLACK
         );
 
         // 2. Update status

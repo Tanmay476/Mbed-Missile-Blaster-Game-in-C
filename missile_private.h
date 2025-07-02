@@ -18,6 +18,8 @@
 //==== [private settings] ====
 extern int  MISSILE_INTERVAL;
 extern int  MISSILE_SPEED;
+extern int DIST_MISSLE_EXPLOSION;
+
 #define MISSILE_COLOR    0xFF0000
 
 //==== [private type] ====

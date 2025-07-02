@@ -81,7 +81,7 @@ int main()
 
     // Game variables
     int num_city = 4;       // Number of cities
-
+    int DIST_MISSLE_EXPLOSION = 10;
     // Game init functions
     //// Init city landscape with specified num of city
     city_landscape_init(num_city);
@@ -211,9 +211,10 @@ void status_bar(PLAYER player) {
 int get_action(GameInputs in) {
 #ifdef F_DEBUG
     pc.printf("[F] get_action()\r\n");
-#endif
+#endif 
   // 1. Check your button inputs and return the corresponding action value
-  if (in.b1 && in.b2) {
+  if (player_get_info().score%10 == 0 || (in.b1 && in.b2)) {
+        DIST_MISSLE_EXPLOSION-=2;
       return LEVEL_ADVANCE;
   }
   if (in.b2 || in.ns_up) {
@@ -277,6 +278,7 @@ int perform_action(int action) {
             return ACTED;
 
         case LEVEL_ADVANCE:
+
             advance_level();
             return ACTED;
 
@@ -306,6 +308,7 @@ int update_game(PLAYER player) {
             player_moveRight();
         
     }
+
     
     // 1. Generate and draw the enemy missiles.
     missile_generator();
@@ -317,11 +320,13 @@ int update_game(PLAYER player) {
     // 3. Update the city landscape. If an enemy missile hits a the city,
     //      you want to update the count and other related things.
     //      HINT: It would be useful to implement update_city_landscape()
-    update_city_landscape();
     
     // 4. Check if the player is hit by an enemy missile.
     //      HINT: It would be useful to implement was_player_hit()
-    was_player_hit();
+    if (was_player_hit() || update_city_landscape() == 0) {
+        return GAME_OVER;
+    }
+
     // 5. Compute player missile colliding/destroying enemy missile on contact.
     //      HINT: It would be useful to implement missile_contact()
     missile_contact();
@@ -339,6 +344,7 @@ int update_game(PLAYER player) {
 void advance_level(void) {
     MISSILE_SPEED += 3;
     MISSILE_INTERVAL -= 3;
+
 }
 /**
  * MISSLE_DISTANCE
