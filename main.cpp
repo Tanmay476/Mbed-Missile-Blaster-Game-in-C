@@ -26,6 +26,9 @@
 
 // GLOBAL VARS
 
+int DIST_MISSILE_EXPLOSION = 10;
+
+
 /////////////////////////////////////////////////////////////////////////////////////////
 
 // FUNCTION PROTOTYPES
@@ -81,7 +84,6 @@ int main()
 
     // Game variables
     int num_city = 4;       // Number of cities
-    int DIST_MISSLE_EXPLOSION = 10;
     // Game init functions
     //// Init city landscape with specified num of city
     city_landscape_init(num_city);

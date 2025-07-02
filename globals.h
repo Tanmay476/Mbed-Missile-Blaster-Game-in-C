@@ -38,6 +38,8 @@ extern DigitalOut MBEDLED3;
 extern DigitalOut MBEDLED4;
 
 // === [global settings] ===
+extern int DIST_MISSLE_EXPLOSION;
+
 #define F_DEBUG   1                     // Debug flag
 
 #define PI 3.1415926
