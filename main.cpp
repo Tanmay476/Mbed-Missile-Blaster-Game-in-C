@@ -24,13 +24,6 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-// GLOBAL VARS
-
-int DIST_MISSILE_EXPLOSION = 10;
-
-
-/////////////////////////////////////////////////////////////////////////////////////////
-
 // FUNCTION PROTOTYPES
 int setup_libs();
 void status_bar(PLAYER player);
@@ -202,7 +195,7 @@ void status_bar(PLAYER player) {
         player.x, player.y, player.score, player.status);
     uLCD.text_string(str,0,0,FONT_7X8,RED);
     char buf[32];
-    snprintf(buf, sizeof(buf), "SUPERS: %d", p.super_missiles_left);
+    snprintf(buf, sizeof(buf), "SUPERS: %d", player.super_missiles_left);
     uLCD.text_string(buf, 0, 1, FONT_7X8, GREEN);
 }
 
