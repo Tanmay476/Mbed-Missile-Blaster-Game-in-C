@@ -206,10 +206,24 @@ const char *lastShip =      "00000W00000"
                             "WW0RR0RR0WW"
                             "W000000000W";
 
+const char *black =         "00000000000"
+                            "00000000000"
+                            "00000000000"
+                            "00000000000"
+                            "00000000000"
+                            "00000000000"
+                            "00000000000"
+                            "00000000000"
+                            "00000000000"
+                            "00000000000"
+                            "00000000000";
+
 //new comments
 // ==== player_private.h implementation ====
 void player_draw(int color) {
-    if (player.status == THREE_HEARTS) {
+    if (color == BACKGROUND_COLOR) {
+        draw_img(player.x, player.y, black);
+    } else if (player.status == THREE_HEARTS) {
         draw_img(player.x, player.y, healthyShip);
     } else if (player.status == TWO_HEARTS) {
         draw_img(player.x, player.y, midShip);
