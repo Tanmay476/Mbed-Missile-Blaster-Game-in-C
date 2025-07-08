@@ -49,6 +49,8 @@ extern int DIST_MISSILE_EXPLOSION;
 #define RED 0xF800 //red
 #define ORANGE 0xFD20 //orange
 #define WHITE 0xFFFF //white
+#define GREEN 0x00FF00 //green
+#define BLUE 0x0165fc // blue
 
 #define PLAYER_MISSILE_LENGTH 18
 
