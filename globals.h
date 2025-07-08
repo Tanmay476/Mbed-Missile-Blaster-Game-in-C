@@ -45,7 +45,10 @@ extern int DIST_MISSILE_EXPLOSION;
 #define PI 3.1415926
 
 #define BACKGROUND_COLOR 0x000000 //black
-#define YELLOW 0xFFFF00 //yellow
+#define YELLOW 0xFFE0 //yellow
+#define RED 0xF800 //red
+#define ORANGE 0xFD20 //orange
+#define WHITE 0xFFFF //white
 
 #define PLAYER_MISSILE_LENGTH 18
 
