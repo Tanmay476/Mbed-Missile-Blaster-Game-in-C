@@ -37,7 +37,7 @@ void player_init(int num_city) {
   player.playerMissiles = create_dlinkedlist();
   player.delta = PLAYER_DELTA;
   player.width = PLAYER_WIDTH;
-  player.height = PLAYER_HEIGHT;
+  player.height = PLAYER_HEIGHT; //Should i change this to 11 with sprite change?
   player.score = 0;
   player.num_city = num_city;
   player_draw(PLAYER_COLOR);
@@ -150,57 +150,74 @@ void player_missile_draw(void) {
     }
   
 }
+
+//Example declaration:
+const char *healthyShip =   "00000W00000"
+                            "00000W00000"
+                            "0000WWW0000"
+                            "0000WWW0000"
+                            "00G0WWW0G00"
+                            "00W0WGW0W00"
+                            "G0BWGWGWB0G"
+                            "W0WWWWWWW0W"
+                            "WWWWGWGWWWW"
+                            "WW0GG0GG0WW"
+                            "W000000000W";
+
+const char *midShip =       "00000W00000"
+                            "00000W00000"
+                            "0000WWW0000"
+                            "0000WWW0000"
+                            "00Y0WWW0Y00"
+                            "00W0WYW0W00"
+                            "Y0BWYWYWB0Y"
+                            "W0WWWWWWW0W"
+                            "WWWWYWYWWWW"
+                            "WW0YY0YY0WW"
+                            "W000000000W";
+
+const char *lastShip =      "00000W00000"
+                            "00000W00000"
+                            "0000WWW0000"
+                            "0000WWW0000"
+                            "00R0WWW0R00"
+                            "00W0WRW0W00"
+                            "R0BWRWRWB0R"
+                            "W0WWWWWWW0W"
+                            "WWWWRWRWWWW"
+                            "WW0RR0RR0WW"
+                            "W000000000W";
+
 //new comments
 // ==== player_private.h implementation ====
 void player_draw(int color) {
-//   uLCD.filled_rectangle(player.x, player.y, player.x + player.width,
-//                         player.y + player.height, color);
-//   uLCD.filled_rectangle(player.x + player.delta, player.y - player.delta,
-//                         player.x + player.width - player.delta,
-//                         player.y + player.height, color);
     if (player.status == THREE_HEARTS) {
-
+        draw_img(player.x, player.y, healthyShip);
     } else if (player.status == TWO_HEARTS) {
-
-    } else if (player.status == ONE_HEART) {
-
-    } else {
-
+        draw_img(player.x, player.y, midShip);
+    } else { //ONE_HEART
+        draw_img(player.x, player.y, lastShip);
     }
-
-
 }
 
-void draw_img(int x, int y, const char *img) {
-  int colors[CELL_SIZE * CELL_SIZE];
-  for (int i = 0; i < CELL_SIZE * CELL_SIZE; i++) {
+ void draw_img(int x, int y, const char *img) {
+  int colors[11 * 11];
+  for (int i = 0; i < 11 * 11; i++) {
     switch (img[i]) {
     case 'R':
       colors[i] = RED;
       break;
-    case 'L':
-      colors[i] = BLUE;
-      break;
-    case 'Y':
-      colors[i] = YELLOW;
-      break;
-    case 'B':
-      colors[i] = BROWN;
-      break;
-    case 'G':
-      colors[i] = GREEN;
-      break;
-    case 'P':
-      colors[i] = PURPLE;
-      break;
-    case 'O':
-      colors[i] = ORANGE;
-      break;
     case 'W':
-      colors[i] = WHITE;
-      break;
-    case 'I':
-      colors[i] = PINK;
+        colors[i] = WHITE;
+        break;
+    case 'G':
+        colors[i] = GREEN;
+        break;
+    case 'Y':
+        colors[i] = YELLOW;
+        break;
+    case 'B':
+      colors[i] = BLUE;
       break;
     case '0':
       colors[i] = BLACK;
@@ -209,21 +226,9 @@ void draw_img(int x, int y, const char *img) {
       colors[i] = BLACK;
     }
   }
-  uLCD.BLIT(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE, colors);
-  wait_us(250); // Recovery time!
+  uLCD.BLIT(x, y, 11, 11, colors);
+  wait_us(250); // Recovery time! 
 }
-
-//Example declaration:
-const char *old_fruit_img = "000BG000"
-                            "000B0000"
-                            "0RRRRRR0"
-                            "RRRRRRRR"
-                            "RRRRRRRR"
-                            "RRRRRRRR"
-                            "0RRRRRR0"
-                            "00RRRR00";
-
-
 
 
 void player_update_city(void) { player.num_city--; }
