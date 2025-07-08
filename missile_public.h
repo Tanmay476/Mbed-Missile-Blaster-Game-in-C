@@ -27,6 +27,7 @@ typedef struct {
     double target_x;           ///< The x-coordinate of the missile's target
     int tick;                  ///< The missile's internal tick
     MISSILE_STATUS status;   ///< The missile status, see MISSILE_STATUS
+    bool is_super;    // true for a “super” missile
 } MISSILE;
 
 /** Call missile_init() only once at the begining of your code */
@@ -54,8 +55,8 @@ void set_missile_speed(int speed);
 /** Set the interval that the missiles fire, interval has range of 1-100 with 1 being fired in
     very quick succession and 100 being fired very slowly after one another
 */
-void set_missile_interval(int interval);
-
 void missile_explode(int x, int y);
+
+void set_missile_interval(int interval);
 
 #endif //MISSILE_PUBLIC_H

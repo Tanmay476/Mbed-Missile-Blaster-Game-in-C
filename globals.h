@@ -38,8 +38,6 @@ extern DigitalOut MBEDLED3;
 extern DigitalOut MBEDLED4;
 
 // === [global settings] ===
-extern int DIST_MISSILE_EXPLOSION;
-
 #define F_DEBUG   1                     // Debug flag
 
 #define PI 3.1415926
@@ -49,16 +47,18 @@ extern int DIST_MISSILE_EXPLOSION;
 #define RED 0xF800 //red
 #define ORANGE 0xFD20 //orange
 #define WHITE 0xFFFF //white
-#define GREEN 0x00FF00 //green
-#define BLUE 0x0165fc // blue
+#define GREEN 0x07E0 //green
+
 
 #define PLAYER_MISSILE_LENGTH 18
 
 #define STATUS_BAR_HEIGHT 7         // Height of status bar
+#define DIST_MISSLE_EXPLOSION 10    // Missle explosion distance
 #define LANDSCAPE_HEIGHT 4          // Pixel count for landscape at bottom of screen for the city
 #define MAX_BUILDING_HEIGHT 10      // Pixel count for height of city buildings
 #define CITY_HIT_MARGIN 1           // Pixel count for hit margin around building in city
 #define CITY_UPPER_BOUND (SIZE_Y-(LANDSCAPE_HEIGHT+MAX_BUILDING_HEIGHT))
+#define ACTION_SUPER_MISSILE  99   // Action for super missile
 
 #define NO_RESULT 0
 #define ACTED 1
@@ -75,6 +75,7 @@ extern int DIST_MISSILE_EXPLOSION;
 
 #define LEVEL_ADVANCE 9
 #define MISSILE_HIT_POINTS 10
+#define DIST_MISSILE_EXPLOSION 10
 
 
 #define PLAYER_HIT 1
