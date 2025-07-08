@@ -24,7 +24,9 @@ typedef struct {
 } PLAYER_MISSILE;
 
 typedef enum {
-    ALIVE = 1,
+    THREE_HEARTS = 3,
+    TWO_HEARTS = 2,
+    ONE_HEART = 1,
     DESTROYED = 0
 } PLAYER_STATUS; // is player aircraft alive or destroyed?
 

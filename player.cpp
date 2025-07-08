@@ -11,6 +11,7 @@
 #include "missile_private.h"
 #include "missile_public.h"
 #include "player_private.h"
+#include "player_public.h"
 
 PLAYER player; // structure of player
 
@@ -32,7 +33,7 @@ void player_init(int num_city) {
 #endif
   player.x = PLAYER_INIT_X;
   player.y = PLAYER_INIT_Y;
-  player.status = ALIVE;
+  player.status = THREE_HEARTS;
   player.playerMissiles = create_dlinkedlist();
   player.delta = PLAYER_DELTA;
   player.width = PLAYER_WIDTH;
@@ -152,12 +153,78 @@ void player_missile_draw(void) {
 //new comments
 // ==== player_private.h implementation ====
 void player_draw(int color) {
-  uLCD.filled_rectangle(player.x, player.y, player.x + player.width,
-                        player.y + player.height, color);
-  uLCD.filled_rectangle(player.x + player.delta, player.y - player.delta,
-                        player.x + player.width - player.delta,
-                        player.y + player.height, color);
+//   uLCD.filled_rectangle(player.x, player.y, player.x + player.width,
+//                         player.y + player.height, color);
+//   uLCD.filled_rectangle(player.x + player.delta, player.y - player.delta,
+//                         player.x + player.width - player.delta,
+//                         player.y + player.height, color);
+    if (player.status == THREE_HEARTS) {
+
+    } else if (player.status == TWO_HEARTS) {
+
+    } else if (player.status == ONE_HEART) {
+
+    } else {
+
+    }
+
+
 }
+
+void draw_img(int x, int y, const char *img) {
+  int colors[CELL_SIZE * CELL_SIZE];
+  for (int i = 0; i < CELL_SIZE * CELL_SIZE; i++) {
+    switch (img[i]) {
+    case 'R':
+      colors[i] = RED;
+      break;
+    case 'L':
+      colors[i] = BLUE;
+      break;
+    case 'Y':
+      colors[i] = YELLOW;
+      break;
+    case 'B':
+      colors[i] = BROWN;
+      break;
+    case 'G':
+      colors[i] = GREEN;
+      break;
+    case 'P':
+      colors[i] = PURPLE;
+      break;
+    case 'O':
+      colors[i] = ORANGE;
+      break;
+    case 'W':
+      colors[i] = WHITE;
+      break;
+    case 'I':
+      colors[i] = PINK;
+      break;
+    case '0':
+      colors[i] = BLACK;
+      break;
+    default:
+      colors[i] = BLACK;
+    }
+  }
+  uLCD.BLIT(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE, colors);
+  wait_us(250); // Recovery time!
+}
+
+//Example declaration:
+const char *old_fruit_img = "000BG000"
+                            "000B0000"
+                            "0RRRRRR0"
+                            "RRRRRRRR"
+                            "RRRRRRRR"
+                            "RRRRRRRR"
+                            "0RRRRRR0"
+                            "00RRRR00";
+
+
+
 
 void player_update_city(void) { player.num_city--; }
 
@@ -165,6 +232,10 @@ void player_update_score(int point) { player.score += point; }
 
 // destroy and "erase" the player off the screen. change status to DESTROYED
 void player_destroy() {
-  player_draw(BACKGROUND_COLOR);
-  player.status = DESTROYED;
+  if (player.status > DESTROYED) {
+    player.status = (PLAYER_STATUS)(player.status - 1);
+  }
+  if (player.status == DESTROYED) {
+    player_draw(BACKGROUND_COLOR);
+  }
 }

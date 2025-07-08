@@ -198,7 +198,8 @@ int setup_libs()
 void status_bar(PLAYER player) {
     uLCD.filled_rectangle(0, 0, 160, STATUS_BAR_HEIGHT, BLACK);
     char str[1024];
-    snprintf(str,sizeof(str),"TA|P:%d,%d S:%d",player.x,player.y,player.score);
+    snprintf(str,sizeof(str),"TA|P:%d,%d S:%d \n HEALTH: %d \n", 
+        player.x, player.y, player.score, player.status);
     uLCD.text_string(str,0,0,FONT_7X8,RED);
 }
 
@@ -319,7 +320,8 @@ int update_game(PLAYER player) {
     
     // 4. Check if the player is hit by an enemy missile.
     //      HINT: It would be useful to implement was_player_hit()
-    if (was_player_hit() || update_city_landscape() == 0) {
+    was_player_hit();
+    if (player.status == DESTROYED || update_city_landscape() == 0) {
         return GAME_OVER;
     }
 
@@ -505,7 +507,7 @@ int was_player_hit() {
         if (currMissile->status == MISSILE_ACTIVE) { 
             
             if (missile_distance(currMissile->x, currMissile->y, player_get_info().x, player_get_info().y) <= DIST_MISSILE_EXPLOSION) {
-                    player_destroy(); 
+                    player_destroy();
                     currMissile->status = MISSILE_EXPLODED; 
                     uLCD.filled_circle(currMissile->x, currMissile->y, 2, YELLOW);
                     wait(0.05);
