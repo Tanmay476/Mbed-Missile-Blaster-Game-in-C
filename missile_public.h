@@ -56,4 +56,6 @@ void set_missile_speed(int speed);
 */
 void set_missile_interval(int interval);
 
+void missile_explode(int x, int y);
+
 #endif //MISSILE_PUBLIC_H
