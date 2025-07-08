@@ -404,9 +404,7 @@ void missile_contact(void) {
                 if (missile_distance(currPlayer->x, currPlayer->y, currEnemy->x, currEnemy->y) <= DIST_MISSILE_EXPLOSION) {
                     currEnemy->status = MISSILE_EXPLODED;
                     currPlayer->status = MISSILE_EXPLODED;
-                    uLCD.filled_circle(currPlayer->x, currPlayer->y, 2, YELLOW);
-                    wait(0.05);
-                    uLCD.filled_circle(currPlayer->x, currPlayer->y, 2, BLACK);
+                    missile_explode(currPlayer->x, currPlayer->y);
                     player_update_score(MISSILE_HIT_POINTS);
                 }
                 currEnMissile = currEnMissile->next;
@@ -452,15 +450,11 @@ int update_city_landscape(void){
                     city_demolish(hit_city_index);
                     player_update_city();
                     currMissile->status = MISSILE_EXPLODED;
-                    uLCD.filled_circle(currMissile->x, currMissile->y, 2, YELLOW);
-                    wait(0.05);
-                    uLCD.filled_circle(currMissile->x, currMissile->y, 2, BLACK);
+                    missile_explode(currMissile->x, currMissile->y);
 
                 } else if (currMissile->y >= (SIZE_Y - LANDSCAPE_HEIGHT)) { 
                     currMissile->status = MISSILE_EXPLODED; 
-                    uLCD.filled_circle(currMissile->x, currMissile->y, 2, YELLOW);
-                    wait(0.05);
-                    uLCD.filled_circle(currMissile->x, currMissile->y, 2, BLACK);
+                    missile_explode(currMissile->x, currMissile->y);
 
                 }
             }
@@ -509,9 +503,7 @@ int was_player_hit() {
             if (missile_distance(currMissile->x, currMissile->y, player_get_info().x, player_get_info().y) <= DIST_MISSILE_EXPLOSION) {
                     player_destroy();
                     currMissile->status = MISSILE_EXPLODED; 
-                    uLCD.filled_circle(currMissile->x, currMissile->y, 2, YELLOW);
-                    wait(0.05);
-                    uLCD.filled_circle(currMissile->x, currMissile->y, 2, BLACK);
+                    missile_explode(currMissile->x, currMissile->y);
                     return PLAYER_HIT;
             }
         }
