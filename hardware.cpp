@@ -28,6 +28,7 @@ DigitalIn jz(p14);
 DigitalIn button1(p21); // Pushbuttons (pin)
 DigitalIn button2(p22);
 DigitalIn button3(p23);
+DigitalIn button4(p24);
 AnalogOut DACout(p18);      // Speaker (pin)
 PwmOut speaker(p25);        // PWM Out (pin)
 wave_player waver(&DACout); // Wave player (pin)
@@ -75,6 +76,7 @@ GameInputs read_inputs() {
    in.b1 = !button1.read();
    in.b2 = !button2.read();
    in.b3 = !button3.read();
+   in.b4 = button4.read();
 
   // 2a. Read navigation switch buttons for in. 
     in.ns_left = navs.left();

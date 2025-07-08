@@ -218,7 +218,7 @@ void missile_draw(MISSILE* missile, int color){
 }
 
 MISSILE* missile_create_at(int x, int y) {
-    MISSILE* m = malloc(sizeof(MISSILE));
+    MISSILE* m = (MISSILE*) malloc(sizeof(MISSILE));
     m->source_x = x;
     m->x        = x;
     m->y        = y;

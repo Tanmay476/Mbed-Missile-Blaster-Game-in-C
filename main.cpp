@@ -21,6 +21,7 @@
 #include "missile_public.h"
 #include "player_public.h"
 
+int DIST_MISSILE_EXPLOSION = 10;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -155,7 +156,7 @@ void set_random_seed(Timer t) {
     uLCD.printf("Push any button to start.\n");
     while(1){
       inputs = read_inputs();
-      if (inputs.b1 || inputs.b2 || inputs.b3) break;
+      if (inputs.b1 || inputs.b2 || inputs.b3 || inputs.b4) break;
       }
     uLCD.cls();
     t.stop();
@@ -191,12 +192,9 @@ int setup_libs()
 void status_bar(PLAYER player) {
     uLCD.filled_rectangle(0, 0, 160, STATUS_BAR_HEIGHT, BLACK);
     char str[1024];
-    snprintf(str,sizeof(str),"TA|P:%d,%d S:%d \n HEALTH: %d \n", 
-        player.x, player.y, player.score, player.status);
+    snprintf(str,sizeof(str),"TA|P:%d,%d S:%d \n HEALTH: %d \n SUPERS: %d \n",
+        player.x, player.y, player.score, player.status, player.super_missiles_left);
     uLCD.text_string(str,0,0,FONT_7X8,RED);
-    char buf[32];
-    snprintf(buf, sizeof(buf), "SUPERS: %d", player.super_missiles_left);
-    uLCD.text_string(buf, 0, 1, FONT_7X8, GREEN);
 }
 
 /**
@@ -214,7 +212,7 @@ int get_action(GameInputs in) {
 #endif 
 
   // 1. Check your button inputs and return the corresponding action value'
-  if (in.b1 && in.b2 && in.b3) {
+  if (in.ns_left) {
       return ACTION_SUPER_MISSILE;
   }
   if (player_get_info().score != 0 && player_get_info().score%100 == 0 || (in.b1 && in.b2)) {

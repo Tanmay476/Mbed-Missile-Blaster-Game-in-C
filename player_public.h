@@ -60,5 +60,6 @@ void player_update_score(int);  // updates the score
 void player_destroy(void); // destroy the player to end game
 
 void player_fire_super(void); // fire a super missile
+MISSILE* missile_create_at(int x, int y);
 
 #endif //PLAYER_PUBLIC_H

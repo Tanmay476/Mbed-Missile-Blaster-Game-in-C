@@ -100,25 +100,28 @@ void player_fire() {
     tempMissile->source_x = player.x + player.width/2;
     
     tempMissile->x = tempMissile->source_x;
-    tempMissile->y = player.y;
+    tempMissile->y = player.y - 10;
     tempMissile->target_x = tempMissile->source_x;
   // 2. Set the status of the missile from player
     tempMissile->status = MISSILE_ACTIVE;
     tempMissile->tick = 0;
+    tempMissile->is_super = 0;
   // 3. Add new missile to appropriate DLL object
   insertHead(player.playerMissiles, tempMissile);
 }
 
 void player_fire_super(void) {
-    PLAYER p = player_get_info();
-    if (p.super_missiles_left > 0 && p.status != DESTROYED) {
-        // spawn a missile at the ship’s center
-        MISSILE* m = missile_create_at(p.x + p.width/2, p.y);
-        m->is_super = true;          // flag it
-        p.super_missiles_left--;     // consume one
-        player_set_info(p);          // write back
-    } else {
-        playSound("empty.wav");      // out-of-supers feedback
+    if (player.super_missiles_left > 0 && player.status != DESTROYED) {
+        MISSILE* tempMissile = (MISSILE *)malloc(sizeof(MISSILE));
+        tempMissile->source_x = player.x + player.width/2;
+        tempMissile->x = tempMissile->source_x;
+        tempMissile->y = player.y;
+        tempMissile->target_x = tempMissile->source_x;
+        tempMissile->status = MISSILE_ACTIVE;
+        tempMissile->tick = 0;
+        tempMissile->is_super = 1; // Mark as super missile
+        insertHead(player.playerMissiles, tempMissile);
+        player.super_missiles_left--;
     }
 }
 
@@ -130,43 +133,39 @@ void player_missile_draw(void) {
 #ifdef F_DEBUG
   pc.printf("[F] player_missile_draw()\r\n");
 #endif
-    //new
-  // 1. Initialize the missile
-    
-  // 2. Looping through all player missiles
-  //      2a. If missile status is MISSLE_EXPLODED
-  //          1a1. Erase missile on screen and delete appropriately from DLL
-  //      2b. Else,
-  //          1b1. Update missile position based on speed
-  //          1b2. If missile is going off-screen, erase missile and delete
-  //          approrpiately from DLL 1b3. Else, draw missile at new location.
-  //  NOTE: You don't have to necessarily show the trace of the missile.
-  //        To draw the missile, you can use the uLCD.line(). A similar library
-  //              is used in missile.cpp
     LLNode *currNode = player.playerMissiles->head;
-    LLNode *nextNode = NULL; //new node
+    LLNode *nextNode = NULL;
     while (currNode != NULL) {
         MISSILE* currentMissile = (MISSILE*)(currNode->data);
         nextNode = currNode->next;
+        // Erase old missile line
         uLCD.line(currentMissile->x, currentMissile->y,
-                          currentMissile->x, currentMissile->y + PLAYER_MISSILE_LENGTH, BLACK);
+                  currentMissile->x, currentMissile->y + PLAYER_MISSILE_LENGTH, BLACK);
+        // Erase old circle if super missile
+        if (currentMissile->is_super) {
+            uLCD.circle(currentMissile->x, currentMissile->y, 2, BLACK);
+        }
         if (currentMissile->status == MISSILE_EXPLODED) {
-                free(currentMissile); 
-                deleteNode(player.playerMissiles, currNode);
+            free(currentMissile); 
+            deleteNode(player.playerMissiles, currNode);
         } else {
             currentMissile->y -= MISSILE_SPEED; 
             if(currentMissile->y + PLAYER_MISSILE_LENGTH < 0) {
                 free(currentMissile); 
                 deleteNode(player.playerMissiles, currNode);
             } else {
-                uLCD.line(currentMissile->x, currentMissile->y,
-                          currentMissile->x, currentMissile->y + PLAYER_MISSILE_LENGTH, BLUE);
+                if (currentMissile->is_super) {
+                    uLCD.line(currentMissile->x, currentMissile->y,
+                              currentMissile->x, currentMissile->y + PLAYER_MISSILE_LENGTH, RED);
+                    uLCD.circle(currentMissile->x, currentMissile->y, 2, RED);
+                } else {
+                    uLCD.line(currentMissile->x, currentMissile->y,
+                              currentMissile->x, currentMissile->y + PLAYER_MISSILE_LENGTH, BLUE);
+                }
             }
-            
         }
         currNode = nextNode;
     }
-  
 }
 
 //Example declaration:
@@ -218,21 +217,8 @@ const char *black =         "00000000000"
                             "00000000000"
                             "00000000000";
 
-//new comments
-// ==== player_private.h implementation ====
-void player_draw(int color) {
-    if (color == BACKGROUND_COLOR) {
-        draw_img(player.x, player.y, black);
-    } else if (player.status == THREE_HEARTS) {
-        draw_img(player.x, player.y, healthyShip);
-    } else if (player.status == TWO_HEARTS) {
-        draw_img(player.x, player.y, midShip);
-    } else { //ONE_HEART
-        draw_img(player.x, player.y, lastShip);
-    }
-}
 
- void draw_img(int x, int y, const char *img) {
+void draw_img(int x, int y, const char *img) {
   int colors[11 * 11];
   for (int i = 0; i < 11 * 11; i++) {
     switch (img[i]) {
@@ -260,6 +246,20 @@ void player_draw(int color) {
   }
   uLCD.BLIT(x, y, 11, 11, colors);
   wait_us(250); // Recovery time! 
+}
+
+//new comments
+// ==== player_private.h implementation ====
+void player_draw(int color) {
+    if (color == BACKGROUND_COLOR) {
+        draw_img(player.x, player.y, black);
+    } else if (player.status == THREE_HEARTS) {
+        draw_img(player.x, player.y, healthyShip);
+    } else if (player.status == TWO_HEARTS) {
+        draw_img(player.x, player.y, midShip);
+    } else { //ONE_HEART
+        draw_img(player.x, player.y, lastShip);
+    }
 }
 
 
