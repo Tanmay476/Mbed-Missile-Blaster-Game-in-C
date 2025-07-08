@@ -38,6 +38,7 @@ typedef struct {
     int num_city;
     PLAYER_STATUS status;
     DLinkedList* playerMissiles;
+    int super_missiles_left;  // number of super missiles left
 } PLAYER; // structure for player
 
 //comments
@@ -57,5 +58,7 @@ void player_update_score(int);  // updates the score
 //void player_missile_exploded(PLAYER_MISSILE *playerMissile); //method overload
 
 void player_destroy(void); // destroy the player to end game
+
+void player_fire_super(void); // fire a super missile
 
 #endif //PLAYER_PUBLIC_H

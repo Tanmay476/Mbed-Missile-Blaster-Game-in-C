@@ -23,6 +23,10 @@ PLAYER player_get_info(
   return player;
 }
 
+void player_set_info(PLAYER p) {
+    player = p;
+}
+
 /**
  * Initialize the player's position, missile status, draw player
  * @param num_city The missile to be drawn
@@ -40,6 +44,7 @@ void player_init(int num_city) {
   player.height = PLAYER_HEIGHT; //Should i change this to 11 with sprite change?
   player.score = 0;
   player.num_city = num_city;
+  player.super_missiles_left = 3;  // give 3 super shots
   player_draw(PLAYER_COLOR);
 }
 
@@ -102,6 +107,19 @@ void player_fire() {
     tempMissile->tick = 0;
   // 3. Add new missile to appropriate DLL object
   insertHead(player.playerMissiles, tempMissile);
+}
+
+void player_fire_super(void) {
+    PLAYER p = player_get_info();
+    if (p.super_missiles_left > 0 && p.status != DESTROYED) {
+        // spawn a missile at the ship’s center
+        MISSILE* m = missile_create_at(p.x + p.width/2, p.y);
+        m->is_super = true;          // flag it
+        p.super_missiles_left--;     // consume one
+        player_set_info(p);          // write back
+    } else {
+        playSound("empty.wav");      // out-of-supers feedback
+    }
 }
 
 /**

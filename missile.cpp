@@ -216,3 +216,16 @@ void missile_draw(MISSILE* missile, int color){
 
     uLCD.line(init_x, init_y, current_x, current_y, color);
 }
+
+MISSILE* missile_create_at(int x, int y) {
+    MISSILE* m = malloc(sizeof(MISSILE));
+    m->source_x = x;
+    m->x        = x;
+    m->y        = y;
+    m->target_x = rand() % SIZE_X;
+    m->status   = MISSILE_ACTIVE;
+    m->tick     = 0;
+    m->is_super = false;   // will be flipped by player_fire_super()
+    insertHead(missileDLL, m);
+    return m;
+}

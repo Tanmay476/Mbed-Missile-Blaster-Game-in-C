@@ -201,6 +201,9 @@ void status_bar(PLAYER player) {
     snprintf(str,sizeof(str),"TA|P:%d,%d S:%d \n HEALTH: %d \n", 
         player.x, player.y, player.score, player.status);
     uLCD.text_string(str,0,0,FONT_7X8,RED);
+    char buf[32];
+    snprintf(buf, sizeof(buf), "SUPERS: %d", p.super_missiles_left);
+    uLCD.text_string(buf, 0, 1, FONT_7X8, GREEN);
 }
 
 /**
@@ -216,7 +219,11 @@ int get_action(GameInputs in) {
 #ifdef F_DEBUG
     pc.printf("[F] get_action()\r\n");
 #endif 
-  // 1. Check your button inputs and return the corresponding action value
+
+  // 1. Check your button inputs and return the corresponding action value'
+  if (in.b1 && in.b2 && in.b3) {
+      return ACTION_SUPER_MISSILE;
+  }
   if (player_get_info().score != 0 && player_get_info().score%100 == 0 || (in.b1 && in.b2)) {
         DIST_MISSILE_EXPLOSION-=2;
       return LEVEL_ADVANCE;
@@ -279,6 +286,10 @@ int perform_action(int action) {
              * TODO: Performs a fire action. You might find it helpful to find player_fire().
              */
              player_fire();
+            return ACTED;
+
+        case ACTION_SUPER_MISSILE:
+            player_fire_super(); // ← NEW: one-shot “super” anti-missile
             return ACTED;
 
         case LEVEL_ADVANCE:
@@ -391,30 +402,40 @@ void missile_contact(void) {
     //                  This might impact the score for the player.
 
     DLinkedList* playerMissiles = player_get_info().playerMissiles;
-    DLinkedList* enemyMissiles = get_missile_list();
-    LLNode* currPlayMissile  = playerMissiles->head;
-    //LLNode* currEnMissile  = enemyMissiles->head;
-    while (currPlayMissile != NULL) {
-        MISSILE* currPlayer = (MISSILE*) currPlayMissile->data;
-        if (currPlayer->status == MISSILE_ACTIVE) {
-            LLNode* currEnMissile = enemyMissiles->head; 
+    DLinkedList* enemyMissiles  = get_missile_list();
+    LLNode*     currPlayMissile = playerMissiles->head;
 
-            while (currEnMissile != NULL) {
-                MISSILE* currEnemy = (MISSILE*)(currEnMissile->data);
-                if (missile_distance(currPlayer->x, currPlayer->y, currEnemy->x, currEnemy->y) <= DIST_MISSILE_EXPLOSION) {
-                    currEnemy->status = MISSILE_EXPLODED;
-                    currPlayer->status = MISSILE_EXPLODED;
-                    missile_explode(currPlayer->x, currPlayer->y);
-                    player_update_score(MISSILE_HIT_POINTS);
+    while (currPlayMissile) {
+        MISSILE* currPlayer = (MISSILE*)currPlayMissile->data;
+
+        if (currPlayer->status == MISSILE_ACTIVE) {
+            // 1) Compute per‐missile radius
+            int radius = currPlayer->is_super
+                         ? DIST_MISSILE_EXPLOSION * 2
+                         : DIST_MISSILE_EXPLOSION;
+
+            LLNode* currEnMissile = enemyMissiles->head;
+            while (currEnMissile) {
+                MISSILE* currEnemy = (MISSILE*)currEnMissile->data;
+
+                // 2) Only check against active enemy missiles
+                if (currEnemy->status == MISSILE_ACTIVE) {
+                    if (missile_distance(
+                            currPlayer->x, currPlayer->y,
+                            currEnemy->x,   currEnemy->y
+                        ) <= radius) {
+
+                        currEnemy->status  = MISSILE_EXPLODED;
+                        currPlayer->status = MISSILE_EXPLODED;
+                        missile_explode(currPlayer->x, currPlayer->y);
+                        player_update_score(MISSILE_HIT_POINTS);
+                    }
                 }
                 currEnMissile = currEnMissile->next;
             }
-            currPlayMissile = currPlayMissile->next;
         }
+        currPlayMissile = currPlayMissile->next;
     }
-
-
-
 }
 
 /**
@@ -437,41 +458,46 @@ int update_city_landscape(void){
     //     2c. If the missile hits the ground and not city, the missile explodes
     // 3. Return the number of city left.
 
-    DLinkedList* missiles = get_missile_list();
-    LLNode* curr  = missiles->head;
-    LLNode* nextNode = NULL;
-    while (curr != NULL) {
-        MISSILE* currMissile= (MISSILE*) curr->data;
-        nextNode = curr->next;
-        if (currMissile->status == MISSILE_ACTIVE) {
-            if (currMissile->y >= CITY_UPPER_BOUND) {
-                 int hit_city_index = who_got_hit(currMissile->x);
-                if (hit_city_index != -1) {
-                    city_demolish(hit_city_index);
-                    player_update_city();
-                    currMissile->status = MISSILE_EXPLODED;
-                    missile_explode(currMissile->x, currMissile->y);
+   DLinkedList* missiles = get_missile_list();
+    LLNode* curr = missiles->head;
+    LLNode* nextNode;
 
-                } else if (currMissile->y >= (SIZE_Y - LANDSCAPE_HEIGHT)) { 
-                    currMissile->status = MISSILE_EXPLODED; 
-                    missile_explode(currMissile->x, currMissile->y);
+    while (curr) {
+        MISSILE* m = (MISSILE*)curr->data;
+        nextNode  = curr->next;
 
-                }
+        if (m->status == MISSILE_ACTIVE && m->y >= CITY_UPPER_BOUND) {
+            int hit_city_index = who_got_hit(m->x);
+
+            // compute per‐missile explosion radius
+            int radius = m->is_super
+                         ? DIST_MISSILE_EXPLOSION * 2
+                         : DIST_MISSILE_EXPLOSION;
+
+            if (hit_city_index != -1) {
+                // city hit
+                missile_explode(m->x, m->y);
+                city_demolish(hit_city_index);
+                player_update_city();
+                m->status = MISSILE_EXPLODED;
+
+            } else if (m->y >= (SIZE_Y - LANDSCAPE_HEIGHT)) {
+                // ground hit
+                missile_explode(m->x, m->y);
+                m->status = MISSILE_EXPLODED;
             }
         }
         curr = nextNode;
     }
-    int cities_remaining = 0;
 
+    // count remaining cities
+    int cities_remaining = 0;
     for (int i = 0; i < MAX_NUM_CITY; i++) {
         if (city_record[i].status == EXIST) {
             cities_remaining++;
         }
     }
-    
-    
-    // Return the actual count of cities remaining
-    return cities_remaining; // FIX: Return the calculated count
+    return cities_remaining;
 }
 
 /**
@@ -492,22 +518,30 @@ int was_player_hit() {
     //      2b. If missile hits player, the player is destroyed. Check player_destroy()
     //      2c. The missile also explodes, so update accordingly.
     // 3. Return the status of the player being hit by a missile. Check PLAYER_HIT.
+    PLAYER p = player_get_info();
     DLinkedList* enemyMissiles = get_missile_list();
-    LLNode* curr  = enemyMissiles->head;
-    LLNode* nextNode = NULL;
-    while (curr != NULL) {
-        MISSILE* currMissile= (MISSILE*) curr->data;
-        nextNode = curr->next;
-        if (currMissile->status == MISSILE_ACTIVE) { 
-            
-            if (missile_distance(currMissile->x, currMissile->y, player_get_info().x, player_get_info().y) <= DIST_MISSILE_EXPLOSION) {
-                    player_destroy();
-                    currMissile->status = MISSILE_EXPLODED; 
-                    missile_explode(currMissile->x, currMissile->y);
-                    return PLAYER_HIT;
+    LLNode* curr = enemyMissiles->head;
+    LLNode* nextNode;
+
+    while (curr) {
+        MISSILE* m = (MISSILE*)curr->data;
+        nextNode  = curr->next;
+
+        if (m->status == MISSILE_ACTIVE) {
+            // compute per‐missile explosion radius
+            int radius = m->is_super
+                         ? DIST_MISSILE_EXPLOSION * 2
+                         : DIST_MISSILE_EXPLOSION;
+
+            if (missile_distance(m->x, m->y, p.x, p.y) <= radius) {
+                // player hit
+                missile_explode(m->x, m->y);
+                player_destroy();
+                m->status = MISSILE_EXPLODED;
+                return PLAYER_HIT;
             }
         }
-    curr = nextNode;
+        curr = nextNode;
     }
     return NO_RESULT;
 }
