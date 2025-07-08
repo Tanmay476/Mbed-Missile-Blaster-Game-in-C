@@ -20,6 +20,34 @@ int MISSILE_SPEED = 6;    // Initial default value
 //Create a DLL for missiles
 DLinkedList* missileDLL = NULL;
 
+
+static void explosion_animation(int x, int y) {
+    const int ring_count   = 4;
+    const int ring_spacing = 4;
+    const uint16_t colors[ring_count] = {
+        RED, 
+        ORANGE, 
+        YELLOW, 
+        WHITE
+    };
+    // Draw expanding outline circles
+    for (int i = 0; i < ring_count; i++) {
+        int r = (i + 1) * ring_spacing;
+        uLCD.circle(x, y, r, colors[i]);
+        wait_ms(50);
+    }
+    // Erase circles inward with landscape color
+    for (int i = ring_count - 1; i >= 0; i--) {
+        int r = (i + 1) * ring_spacing;
+        uLCD.circle(x, y, r, BACKGROUND_COLOR);
+        wait_ms(30);
+    }
+}
+// Public wrapper for use elsewhere
+void missile_explode(int x, int y) {
+    explosion_animation(x, y);
+}
+
 void missile_init(void)
 {
     missileDLL = create_dlinkedlist();
