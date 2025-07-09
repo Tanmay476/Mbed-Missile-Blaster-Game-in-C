@@ -22,6 +22,7 @@
 #include "player_public.h"
 
 int DIST_MISSILE_EXPLOSION = 10;
+int level = 1;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -192,8 +193,8 @@ int setup_libs()
 void status_bar(PLAYER player) {
     uLCD.filled_rectangle(0, 0, 160, STATUS_BAR_HEIGHT, BLACK);
     char str[1024];
-    snprintf(str,sizeof(str),"TA|P:%d,%d S:%d \n HEALTH: %d \n SUPERS: %d \n",
-        player.x, player.y, player.score, player.status, player.super_missiles_left);
+    snprintf(str,sizeof(str),"TA|P:%d,%d S:%d \n HEALTH: %d \n SUPERS: %d \n LEVEL: %d",
+        player.x, player.y, player.score, player.status, player.super_missiles_left, level);
     uLCD.text_string(str,0,0,FONT_7X8,RED);
 }
 
@@ -212,11 +213,12 @@ int get_action(GameInputs in) {
 #endif 
 
   // 1. Check your button inputs and return the corresponding action value'
-  if (in.b1 && in.b2) {
+  if (in.b1 && in.b3) {
       return ACTION_SUPER_MISSILE;
   }
   if (player_get_info().score != 0 && player_get_info().score%100 == 0 || (in.b1 && in.b2)) {
         DIST_MISSILE_EXPLOSION-=2;
+        player_get_info().score += 10;
       return LEVEL_ADVANCE;
   }
   if (in.b1 || in.ns_up) {
@@ -345,7 +347,7 @@ int update_game(PLAYER player) {
 void advance_level(void) {
     MISSILE_SPEED += 3;
     MISSILE_INTERVAL -= 3;
-
+    level++;
 }
 /**
  * MISSLE_DISTANCE
