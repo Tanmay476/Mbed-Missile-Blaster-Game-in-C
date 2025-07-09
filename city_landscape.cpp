@@ -99,7 +99,7 @@ void city_demolish(int index) {
             REVERSE_Y(y0),  // bottom (converted)
             x1,
             REVERSE_Y(y1),  // top    (converted)
-            LANDSCAPE_COLOR
+            BACKGROUND_COLOR;
         );
 
         // 4. update status & clear data
