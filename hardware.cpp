@@ -94,8 +94,8 @@ GameInputs read_inputs() {
 
 
 #ifdef F_DEBUG
-  pc.printf("Inputs: B: %d %d %d | A: %f %f %f | N: %d %d %d %d %d | J: %f, %f, %f \r\n", in.b1,
-            in.b2, in.b3, in.ax, in.ay, in.az, in.ns_up, in.ns_down, in.ns_left,
+  pc.printf("Inputs: B: %d %d %d %d | A: %f %f %f | N: %d %d %d %d %d | J: %f, %f, %f \r\n", in.b1,
+            in.b2, in.b3, in.b4, in.ax, in.ay, in.az, in.ns_up, in.ns_down, in.ns_left,
             in.ns_right, in.ns_center);
 #endif
 

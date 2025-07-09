@@ -212,19 +212,20 @@ int get_action(GameInputs in) {
 #endif 
 
   // 1. Check your button inputs and return the corresponding action value'
-  if (in.ns_left) {
+  if (in.b1 && in.b2) {
       return ACTION_SUPER_MISSILE;
   }
   if (player_get_info().score != 0 && player_get_info().score%100 == 0 || (in.b1 && in.b2)) {
         DIST_MISSILE_EXPLOSION-=2;
       return LEVEL_ADVANCE;
   }
-  if (in.b2 || in.ns_up) {
-      return GO_RIGHT;
-  } else if (in.b1 || in.ns_left) {
+  if (in.b1 || in.ns_up) {
       return GO_LEFT;
+  } else if (in.b2 || in.ns_left) {
+      return GO_RIGHT;
   }
-  if (in.b3 || in.ns_down) {
+
+  if (in.b3 || !in.ns_center) {
       return BUTTON_X;
       pc.printf("button 3 pressed !!!!!!");
   }
