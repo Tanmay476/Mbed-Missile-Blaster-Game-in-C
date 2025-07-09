@@ -218,7 +218,7 @@ int get_action(GameInputs in) {
   }
   if (player_get_info().score != 0 && player_get_info().score%100 == 0 || (in.b1 && in.b2)) {
         DIST_MISSILE_EXPLOSION-=2;
-        player_get_info().score += 10;
+        player_update_score(10);
       return LEVEL_ADVANCE;
   }
   if (in.b1 || in.ns_up) {
