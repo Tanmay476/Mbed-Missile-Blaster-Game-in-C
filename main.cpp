@@ -23,6 +23,7 @@
 
 int DIST_MISSILE_EXPLOSION = 10;
 int level = 1;
+int shots = MAGAZINE_SIZE;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -37,6 +38,8 @@ int update_game(PLAYER player);
 
 int missile_distance(int x1, int y1, int x2, int y2); // calculate euclidean distance
 void missile_contact(void); // iterate through missiles and see if any collided
+void update_magazine();
+void reload_animation();
 int was_player_hit(void);
 int update_city_landscape(void);
 int who_got_hit(int missile_x);
@@ -88,8 +91,6 @@ int main()
     //// Init the player structure
     player_init(num_city);
 
-    uLCD.rectangle(80, 10 , 120, 20, BLUE);
-
     pc.printf("Initialization complete\r\n");
     
     // Main Game Loop
@@ -120,6 +121,9 @@ int main()
         int result = update_game(player);
         
         status_bar(player);
+
+        uLCD.filled_rectangle(80, 10 , 120, 20, 0x008000); //Magazine border
+        update_magazine(); //change how much magazine is full based on shots taken
 
         /** 5. Check game state 
          * Check for game Over or similar and handle
@@ -200,6 +204,27 @@ void status_bar(PLAYER player) {
     uLCD.text_string(str,0,0,FONT_7X8,RED);
 }
 
+void update_magazine() {
+    int deltaRec = 40 / MAGAZINE_SIZE;
+    int recRemoved = shots * deltaRec;
+
+    if (shots <= MAGAZINE_SIZE) {
+        uLCD.filled_rectangle(80 + recRemoved, 10, 120, 20, 0x000000);
+    } else {
+        reload_animation();
+        shots = 0;
+    }
+}
+
+void reload_animation() {
+    int frames = 0;
+    while (frames < 500) {
+        uLCD.filled_rectangle(80, 10 , 120, 20, 0x008000); //Magazine border
+
+    }
+}
+
+
 /**
  * GET_ACTION
  *
@@ -230,6 +255,7 @@ int get_action(GameInputs in) {
   }
 
   if (in.b3 || !in.ns_center) {
+      shots--;
       return BUTTON_X;
       pc.printf("button 3 pressed !!!!!!");
   }

@@ -36,6 +36,7 @@ extern DigitalOut MBEDLED1;
 extern DigitalOut MBEDLED2;
 extern DigitalOut MBEDLED3;
 extern DigitalOut MBEDLED4;
+extern int shots;
 extern int DIST_MISSILE_EXPLOSION;
 extern int level;
 
@@ -60,6 +61,8 @@ extern int level;
 #define CITY_HIT_MARGIN 1           // Pixel count for hit margin around building in city
 #define CITY_UPPER_BOUND (SIZE_Y-(LANDSCAPE_HEIGHT+MAX_BUILDING_HEIGHT))
 #define ACTION_SUPER_MISSILE  99   // Action for super missile
+
+#define MAGAZINE_SIZE 20            //Size of magazine of player's anti-missile
 
 #define NO_RESULT 0
 #define ACTED 1
