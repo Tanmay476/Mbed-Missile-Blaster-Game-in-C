@@ -88,6 +88,8 @@ int main()
     //// Init the player structure
     player_init(num_city);
 
+    uLCD.rectangle(80, 10 , 120, 20, BLUE);
+
     pc.printf("Initialization complete\r\n");
     
     // Main Game Loop
