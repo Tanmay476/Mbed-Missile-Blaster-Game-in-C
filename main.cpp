@@ -23,7 +23,12 @@
 
 int DIST_MISSILE_EXPLOSION = 10;
 int level = 1;
-int shots = MAGAZINE_SIZE;
+int shots = 0;
+bool reloading = false; // Global flag to prevent shooting during reload
+int reload_frame = 0;
+bool reload_animating = false;
+int reload_frame_counter = 0; // Controls animation speed
+
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -34,7 +39,6 @@ void set_random_seed(Timer);
 int get_action(GameInputs in);
 int perform_action(int action);
 int update_game(PLAYER player);
-
 
 int missile_distance(int x1, int y1, int x2, int y2); // calculate euclidean distance
 void missile_contact(void); // iterate through missiles and see if any collided
@@ -122,7 +126,7 @@ int main()
         
         status_bar(player);
 
-        uLCD.filled_rectangle(80, 10 , 120, 20, 0x008000); //Magazine border
+        // uLCD.filled_rectangle(80, 10 , 120, 20, 0x008000); //Magazine border
         update_magazine(); //change how much magazine is full based on shots taken
 
         /** 5. Check game state 
@@ -205,24 +209,64 @@ void status_bar(PLAYER player) {
 }
 
 void update_magazine() {
-    int deltaRec = 40 / MAGAZINE_SIZE;
-    int recRemoved = shots * deltaRec;
+    // Prevent interaction during reload
+    if (reloading || reload_animating) {
+        reload_animation(); // Continue step-by-step
+        return;
+    }
 
-    if (shots <= MAGAZINE_SIZE) {
-        uLCD.filled_rectangle(80 + recRemoved, 10, 120, 20, 0x000000);
-    } else {
-        reload_animation();
-        shots = 0;
+    // Show the ammo bar (green section)
+    int deltaRec = 40 / MAGAZINE_SIZE;
+    int ammoPixels = (MAGAZINE_SIZE - shots) * deltaRec;
+
+    // Clamp to prevent drawing over the bar
+    if (ammoPixels > 40) ammoPixels = 40;
+    if (ammoPixels < 0) ammoPixels = 0;
+
+    // First, clear the whole magazine bar area
+    uLCD.filled_rectangle(80, 10, 120, 20, 0x000000);
+
+    // Then fill in the green portion for remaining ammo
+    uLCD.filled_rectangle(80, 10, 80 + ammoPixels, 20, 0x008000);
+
+    // Trigger reload if shots >= magazine size
+    if (shots >= MAGAZINE_SIZE) {
+        reload_animation(); // Begin reloading
     }
 }
+
+
 
 void reload_animation() {
-    int frames = 0;
-    while (frames < 500) {
-        uLCD.filled_rectangle(80, 10 , 120, 20, 0x008000); //Magazine border
+    if (!reload_animating) {
+        reload_animating = true;
+        reload_frame = 0;
+        reload_frame_counter = 0;
+        reloading = true;
+        // Start by clearing the bar
+        uLCD.filled_rectangle(80, 10, 120, 20, 0x000000);
+        return;
+    }
 
+    reload_frame_counter++;
+    if (reload_frame_counter < 1) return; // Control animation speed
+    reload_frame_counter = 0;
+
+    int stepWidth = 40 / MAGAZINE_SIZE;
+    if (reload_frame < MAGAZINE_SIZE) {
+        int x1 = 80;
+        int x2 = 80 + stepWidth * (reload_frame + 1);
+        uLCD.filled_rectangle(x1, 10, x2, 20, 0x008000);
+        reload_frame++;
+    } else {
+        // Reload complete
+        shots = 0;
+        reloading = false;
+        reload_animating = false;
     }
 }
+
+
 
 
 /**
@@ -254,11 +298,11 @@ int get_action(GameInputs in) {
       return GO_RIGHT;
   }
 
-  if (in.b3 || !in.ns_center) {
-      shots--;
-      return BUTTON_X;
-      pc.printf("button 3 pressed !!!!!!");
-  }
+    if ((in.b3 || !in.ns_center) && !reloading && !reload_animating) {
+        shots++;
+        return BUTTON_X;
+    }
+
 
   // 2. Check your navigation switch and return the corresponding direction value
   //return new changes
