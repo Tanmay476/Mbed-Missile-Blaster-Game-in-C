@@ -132,7 +132,8 @@ void missile_update_position(void){
             free(currentMissile);
             deleteNode(missileDLL, currNode);
         } else {
-             missile_draw(currentMissile, BLACK);
+             missile_draw(currentMissile, BLACK); // Erase the missile at current position
+             // Update the position of the missile
              currentMissile->y += MISSILE_SPEED;
              currentMissile->x = currentMissile->source_x +
                                 (currentMissile->y * (float)(currentMissile->target_x - currentMissile->source_x) / SIZE_Y);
@@ -216,7 +217,12 @@ void missile_draw(MISSILE* missile, int color){
 
     uLCD.line(init_x, init_y, current_x, current_y, color);
 }
-
+/**
+ * This function creates a missile at a specific position.
+ * @param x The x-coordinate of the missile
+ * @param y The y-coordinate of the missile
+ * @return MISSILE* Pointer to the created missile
+ */
 MISSILE* missile_create_at(int x, int y) {
     MISSILE* m = (MISSILE*) malloc(sizeof(MISSILE));
     m->source_x = x;

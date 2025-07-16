@@ -110,6 +110,7 @@ void player_fire() {
   insertHead(player.playerMissiles, tempMissile);
 }
 
+
 void player_fire_super(void) {
     if (player.super_missiles_left > 0 && player.status != DESTROYED) {
         MISSILE* tempMissile = (MISSILE *)malloc(sizeof(MISSILE));
