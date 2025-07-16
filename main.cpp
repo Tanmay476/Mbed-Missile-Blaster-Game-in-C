@@ -23,33 +23,33 @@
 
 int DIST_MISSILE_EXPLOSION = 10;
 int level = 1;
-int shots = 0;
+int shots = 0; // Number of shots taken
 bool reloading = false; // Global flag to prevent shooting during reload
-int reload_frame = 0;
-bool reload_animating = false;
+int reload_frame = 0; // Current frame of the reload animation
+bool reload_animating = false; // Flag to indicate if reload animation is in progress
 int reload_frame_counter = 0; // Controls animation speed
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
 // FUNCTION PROTOTYPES
-int setup_libs();
-void status_bar(PLAYER player);
-void set_random_seed(Timer);
-int get_action(GameInputs in);
-int perform_action(int action);
-int update_game(PLAYER player);
+int setup_libs(); // Setup libraries and test DLL
+void status_bar(PLAYER player); // Update the status bar
+void set_random_seed(Timer);  // Set a random seed based on timer
+int get_action(GameInputs in); // Get the action based on inputs
+int perform_action(int action); // Perform the action based on inputs
+int update_game(PLAYER player); // Update the game based on the user action
 
 int missile_distance(int x1, int y1, int x2, int y2); // calculate euclidean distance
 void missile_contact(void); // iterate through missiles and see if any collided
-void update_magazine();
-void reload_animation();
-int was_player_hit(void);
-int update_city_landscape(void);
-int who_got_hit(int missile_x);
-void playSound(char * wav);
-void playNotes(void);
-void advance_level(void);
+void update_magazine(); // Update the magazine bar
+void reload_animation(); // Handle the reload animation
+int was_player_hit(void); // Check if the player was hit by an enemy missile
+int update_city_landscape(void); // Update the city landscape
+int who_got_hit(int missile_x);  // Check which city got hit by a missile
+void playSound(char * wav); // Play a sound file
+void playNotes(void); // Play some annoying notes
+void advance_level(void); //    Advance the level
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -236,26 +236,31 @@ void update_magazine() {
 }
 
 
+/// RELOAD_ANIMATION
+// This function handles the reload animation
+// It animates the magazine bar filling up step by step
 
 void reload_animation() {
     if (!reload_animating) {
-        reload_animating = true;
+        reload_animating = true; // Start the reload animation
         reload_frame = 0;
-        reload_frame_counter = 0;
+        reload_frame_counter = 0; // Reset frame counter
+        // Reset the reload state
         reloading = true;
         // Start by clearing the bar
-        uLCD.filled_rectangle(80, 10, 120, 20, 0x000000);
+        uLCD.filled_rectangle(80, 10, 120, 20, 0x000000); 
         return;
     }
 
-    reload_frame_counter++;
+    reload_frame_counter++;  // Increment frame counter
     if (reload_frame_counter < 1) return; // Control animation speed
-    reload_frame_counter = 0;
+    reload_frame_counter = 0; // Reset frame counter
 
-    int stepWidth = 40 / MAGAZINE_SIZE;
+    int stepWidth = 40 / MAGAZINE_SIZE; // Width of each step in the reload animation
+    // Draw the reload animation
     if (reload_frame < MAGAZINE_SIZE) {
         int x1 = 80;
-        int x2 = 80 + stepWidth * (reload_frame + 1);
+        int x2 = 80 + stepWidth * (reload_frame + 1); //    Next step
         uLCD.filled_rectangle(x1, 10, x2, 20, 0x008000);
         reload_frame++;
     } else {
