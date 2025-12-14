@@ -3,3 +3,12 @@ BUILD
 compile_commands.json
 .clangd
 .cache
+.history
+*.bin
+*.o
+*.elf
+*.hex
+.hg
+.hgignore
+*.bak
+*copy
